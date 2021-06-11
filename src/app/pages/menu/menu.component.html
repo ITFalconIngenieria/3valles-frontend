@@ -5,26 +5,49 @@
             <img src="assets/logo-simbolo.svg" alt="logo">
             <h1>TRES VALLES</h1>
         </div>
+
         <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-            <li nz-submenu nzOpen nzTitle="Dashboard" nzIcon="dashboard">
-                <ul>
-                    <li nz-menu-item nzMatchRouter>
-                        <a routerLink="/welcome">Welcome</a>
-                    </li>
-                    <li nz-menu-item nzMatchRouter>
-                        <a>Monitor</a>
-                    </li>
-                    <li nz-menu-item nzMatchRouter>
-                        <a>Workplace</a>
-                    </li>
-                </ul>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzSelected>
+                <i nz-icon nzType="home"></i>
+                <span>Inicio</span>
             </li>
-            <li nz-submenu nzOpen nzTitle="Form" nzIcon="form">
-                <ul>
-                    <li nz-menu-item nzMatchRouter>
-                        <a>Basic Form</a>
-                    </li>
-                </ul>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <a [routerLink]="['/medidor']">
+                    <i nz-icon nzType="dashboard"></i>
+                    <span>Medidores</span>
+                </a>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="cluster"></i>
+                <span>Jerarquias</span>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="thunderbolt"></i>
+                <span>Entrada Energia</span>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="api"></i>
+                <span>Transformadores</span>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="team"></i>
+                <span>Consumidores</span>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="solution"></i>
+                <span>Facturacion</span>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="bar-chart"></i>
+                <span>Reportes</span>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="tool"></i>
+                <span>Configuraciones</span>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <i nz-icon nzType="question-circle"></i>
+                <span>Ayuda</span>
             </li>
         </ul>
     </nz-sider>
@@ -33,6 +56,9 @@
             <div class="app-header">
                 <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
                     <i class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></i>
+                    <span>
+                        <label style="margin-left: 30%;">SISTEMA DE FACTURACIÓN ENÉRGETICA</label>
+                    </span>
                 </span>
             </div>
         </nz-header>

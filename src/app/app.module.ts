@@ -22,6 +22,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { MedidorComponent } from './pages/medidor/medidor.component';
+import { JerarquiaComponent } from './pages/jerarquia/jerarquia.component';
 
 registerLocaleData(es);
 
@@ -29,7 +31,9 @@ registerLocaleData(es);
   declarations: [
     AppComponent,
     MenuComponent,
-    LoginComponent
+    LoginComponent,
+    MedidorComponent,
+    JerarquiaComponent
   ],
   imports: [
     BrowserModule,
