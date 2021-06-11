@@ -1,4 +1,4 @@
-export interface Jerarquia {
+export interface JerarquiaModel {
     id: number;
     descripcion: string;
     dependenciaId: number;

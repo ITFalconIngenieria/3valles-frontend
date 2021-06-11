@@ -1,1 +1,58 @@
-<p>jerarquia works!</p>
+<nz-layout>
+    <nz-header>
+        <div nz-row>
+            <div nz-col nzSpan="20">
+                <h1> Jerarquias </h1>
+            </div>
+            <div nz-col nzSpan="4">
+                <button nz-button nzType="primary" nzShape="round"><i nz-icon nzType="plus" nzTheme="outline"></i>Nueva
+                    jerarquia</button>
+            </div>
+        </div>
+    </nz-header>
+    <nz-content>
+        <div class="tabla">
+            <nz-table #nzTable [nzData]="listofJerarquia" nzTableLayout="fixed" nzPageSize="5">
+                <thead>
+                    <tr>
+                        <th nzWidth="10%" colspan="2">
+                            <nz-filter-trigger [(nzVisible)]="visible" [nzActive]="searchValue.length > 0" nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu">
+                                <i nz-icon nzType="search" ></i>
+                            </nz-filter-trigger>
+                        </th>
+                        <th>Descripcion</th>
+                        <th>Dependencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of nzTable.data">
+                        <td style="width: 30px;">
+                            <button nz-button nzType="primary" nzShape="circle">
+                                <i nz-icon nzType="edit" nzTheme="outline"></i>
+                            </button>
+                        </td>
+                        <td style="width: 30px;">
+                            <button nz-button nzType="primary"  nzShape="circle">
+                                <i nz-icon nzType="delete" nzTheme="outline"></i>
+                            </button>
+                        </td>
+                        <td>{{data.descripcion}}</td>
+                        <td>{{data.dependenciaId}}</td>
+                    </tr>
+                </tbody>
+            </nz-table>
+        </div>
+    </nz-content>
+</nz-layout>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+    <div class="ant-table-filter-dropdown">
+        <div class="search-box">
+            <input type="text" nz-input placeholder="" [(ngModel)]="searchValue" />
+            <button nz-button nzSize="small" nzType="primary" (click)="search()" class="search-button">
+          Buscar
+        </button>
+            <button nz-button nzSize="small" (click)="reset()">Limpiar</button>
+        </div>
+    </div>
+</nz-dropdown-menu>

@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NZ_I18N } from 'ng-zorro-antd/i18n';
-import { es_ES } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import es from '@angular/common/locales/es';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +12,8 @@ import { IconsProviderModule } from './icons-provider.module';
 import { MenuComponent } from './pages/menu/menu.component';
 import { LoginComponent } from './pages/login/login.component';
 //ng-zorro
+import { NZ_I18N } from 'ng-zorro-antd/i18n';
+import { es_ES } from 'ng-zorro-antd/i18n';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -24,6 +24,8 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { MedidorComponent } from './pages/medidor/medidor.component';
 import { JerarquiaComponent } from './pages/jerarquia/jerarquia.component';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 registerLocaleData(es);
 
@@ -43,6 +45,7 @@ registerLocaleData(es);
     HttpClientModule,
     BrowserAnimationsModule,
     IconsProviderModule,
+    //ng-zorro
     NzMenuModule,
     NzLayoutModule,
     NzMenuModule,
@@ -51,7 +54,9 @@ registerLocaleData(es);
     NzButtonModule,
     NzIconModule,
     NzCheckboxModule,
-    NzGridModule    
+    NzGridModule,
+    NzTableModule ,
+    NzDropDownModule  
   ],
   providers: [{ provide: NZ_I18N, useValue: es_ES }],
   bootstrap: [AppComponent]

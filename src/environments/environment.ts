@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://tresvalles-backend.herokuapp.com:3000/'
+  apiUrl: 'https://tresvalles-backend.herokuapp.com/'
 };
 
 /*

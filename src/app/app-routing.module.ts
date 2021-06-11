@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { JerarquiaComponent } from './pages/jerarquia/jerarquia.component';
 import { LoginComponent } from './pages/login/login.component';
 import { MedidorComponent } from './pages/medidor/medidor.component';
 import { MenuComponent } from './pages/menu/menu.component';
@@ -10,7 +11,8 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'menu', component: MenuComponent },
   { path: 'welcome',component: WelcomeComponent},
-  { path: 'medidor', component: MedidorComponent}
+  { path: 'medidor', component: MedidorComponent},
+  { path: 'jerarquia', component: JerarquiaComponent}
  // { path: 'welcome', loadChildren: () => import('./pages/welcome/welcome.module').then(m => m.WelcomeModule) }
 ];
 
