@@ -4,3 +4,11 @@ export interface JerarquiaModel {
     dependenciaId: number;
     estado: boolean;
 }
+
+export interface vJerarquiaModel{
+    id: number;
+    descripcion: string;
+    dependenciaId: number;
+    estado: boolean;
+    herencia: string;
+}

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { JerarquiaService } from 'src/app/servicios/jerarquia.service';
-import { JerarquiaModel } from '../../modelos/jerarquia';
+import { JerarquiaModel, vJerarquiaModel } from '../../modelos/jerarquia';
 
 @Component({
   selector: 'app-jerarquia',
@@ -10,10 +11,11 @@ import { JerarquiaModel } from '../../modelos/jerarquia';
 export class JerarquiaComponent implements OnInit {
   searchValue = '';
   visible = false;
-  listofJerarquia: JerarquiaModel[] = [];
+  listofJerarquia: vJerarquiaModel[] = [];
   listOfDisplayData: any[] = [];
   
   constructor(
+    private fb: FormBuilder,
     private jerarquiaService: JerarquiaService
   ) { }
 
@@ -29,8 +31,8 @@ export class JerarquiaComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.jerarquiaService.getJerarquia().toPromise().then(
-      (data : JerarquiaModel[]) => {
+    this.jerarquiaService.getVJerarquia().toPromise().then(
+      (data : vJerarquiaModel[]) => {
         this.listofJerarquia=data;
         this.listOfDisplayData = [...this.listofJerarquia];
       },

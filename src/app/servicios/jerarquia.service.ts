@@ -27,4 +27,7 @@ export class JerarquiaService {
         return this.http.patch(`${apiUrl}jerarquias/${id}`, jerarquia);
     }
 
+    getVJerarquia() {
+        return this.http.get(`${apiUrl}v-jerarquias?filter[where][estado]=true`)
+    }
 }
