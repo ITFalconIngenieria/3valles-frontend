@@ -12,7 +12,7 @@ export class JerarquiaComponent implements OnInit {
   searchValue = '';
   visible = false;
   listofJerarquia: vJerarquiaModel[] = [];
-  listOfDisplayData: any[] = [];
+  listOfDisplayData: vJerarquiaModel[] = [];
   
   constructor(
     private fb: FormBuilder,
@@ -26,7 +26,8 @@ export class JerarquiaComponent implements OnInit {
 
   search(): void {
     this.visible = false;
-    this.listOfDisplayData = this.listofJerarquia.filter((item: any) => (item.descripcion.indexOf(this.searchValue) !== -1));
+    this.listOfDisplayData = this.listofJerarquia.filter((item: vJerarquiaModel) => (item.descripcion.indexOf(this.searchValue) !== -1));
+    console.log(this.listOfDisplayData);
   }
 
   ngOnInit(): void {

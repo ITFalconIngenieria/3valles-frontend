@@ -8,8 +8,10 @@
 
         <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzSelected>
-                <i nz-icon nzType="home"></i>
-                <span>Inicio</span>
+                <a [routerLink]="['/welcome']">
+                    <i nz-icon nzType="home"></i>
+                    <span>Inicio</span>
+                </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
                 <a [routerLink]="['/medidor']">
@@ -18,20 +20,28 @@
                 </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
-                <i nz-icon nzType="cluster"></i>
-                <span>Jerarquias</span>
+                <a [routerLink]="['/jerarquia']">
+                    <i nz-icon nzType="cluster"></i>
+                    <span>Jerarquias</span>
+                </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
-                <i nz-icon nzType="thunderbolt"></i>
-                <span>Entrada Energia</span>
+                <a [routerLink]="['/entrada']">
+                    <i nz-icon nzType="thunderbolt"></i>
+                    <span>Entrada Energia</span>
+                </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
-                <i nz-icon nzType="api"></i>
-                <span>Transformadores</span>
+                <a [routerLink]="['/transformadores']">
+                    <i nz-icon nzType="api"></i>
+                    <span>Transformadores</span>
+                </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
-                <i nz-icon nzType="team"></i>
-                <span>Consumidores</span>
+                <a [routerLink]="['/consumidores']">
+                    <i nz-icon nzType="team"></i>
+                    <span>Consumidores</span>
+                </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
                 <i nz-icon nzType="solution"></i>

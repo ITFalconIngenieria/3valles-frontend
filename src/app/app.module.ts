@@ -26,6 +26,9 @@ import { MedidorComponent } from './pages/medidor/medidor.component';
 import { JerarquiaComponent } from './pages/jerarquia/jerarquia.component';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { EntradaComponent } from './pages/entrada/entrada.component';
+import { TransformadoresComponent } from './pages/transformadores/transformadores.component';
+import { ConsumidoresComponent } from './pages/consumidores/consumidores.component';
 
 registerLocaleData(es);
 
@@ -35,7 +38,10 @@ registerLocaleData(es);
     MenuComponent,
     LoginComponent,
     MedidorComponent,
-    JerarquiaComponent
+    JerarquiaComponent,
+    EntradaComponent,
+    TransformadoresComponent,
+    ConsumidoresComponent
   ],
   imports: [
     BrowserModule,

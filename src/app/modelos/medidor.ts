@@ -1,4 +1,4 @@
-export interface Medidor{
+export interface MedidorModel{
     id:number;
     codigo: string;
     lecturaMax: any;
@@ -7,7 +7,7 @@ export interface Medidor{
     estado: boolean;
 }
 
-export interface Rollover {
+export interface RolloverModel{
     id: number;
     medidorId: number;
     fecha: string;

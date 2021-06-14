@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
       this.validateForm.controls[i].updateValueAndValidity();
     }
 
-    this.route.navigate(['menu']);
+    this.route.navigate(['welcome']);
   }
 
   constructor(private fb: FormBuilder, private route: Router,) {}
