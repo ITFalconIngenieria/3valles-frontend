@@ -21,8 +21,8 @@
                                 <i nz-icon nzType="search"></i>
                             </nz-filter-trigger>
                         </th>
-                        <th>Codigo</th>
-                        <th>Lectura Maxima</th>
+                        <th>Equipo</th>
+                        <th>Descripcion</th>
                         <th>Multiplicador</th>
                         <th>Disponible</th>
                         <th></th>
@@ -41,7 +41,7 @@
                             </button>
                         </td>
                         <td>{{data.codigo}}</td>
-                        <td>{{data.lecturaMax}}</td>
+                        <td>{{data.variable}}</td>
                         <td>{{data.multiplicador}}</td>
                         <td>
                             <div *ngIf="data.estado; else estadoFalse"><i nz-icon nzType="check-circle" nzTheme="twotone"></i></div>

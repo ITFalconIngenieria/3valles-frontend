@@ -19,6 +19,9 @@ export class MedidorService {
         return this.http.get(`${apiUrl}medidors`);
     }
 
+    getvMedidor() {
+        return this.http.get(`${apiUrl}v-medidor-variables`);
+    }
 
     postMedidor(medidor) {
         return this.http.post(`${apiUrl}medidors`, medidor);
