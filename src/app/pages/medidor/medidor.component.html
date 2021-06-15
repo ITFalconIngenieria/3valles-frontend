@@ -44,8 +44,8 @@
                         <td>{{data.lecturaMax}}</td>
                         <td>{{data.multiplicador}}</td>
                         <td>
-                            <div *ngIf=data.estado><i nz-icon nzType="check-circle" nzTheme="twotone"></i></div>
-                            <div *ngIf=!data.estado><i nz-icon nzType="close-circle" nzTheme="twotone"></i></div>
+                            <div *ngIf="data.estado; else estadoFalse"><i nz-icon nzType="check-circle" nzTheme="twotone"></i></div>
+                            <ng-template #estadoFalse><i nz-icon nzType="close-circle" nzTheme="twotone"></i></ng-template>
                         </td>
                         <td nzWidth="30px">
                             <button nz-button nzType="primary" nzSize="small" nzShape="round">Rollover</button>

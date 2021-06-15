@@ -1,1 +1,62 @@
-<p>transformadores works!</p>
+<nz-layout>
+    <nz-header>
+        <div nz-row>
+            <div nz-col nzSpan="20">
+                <h1> Transformador </h1>
+            </div>
+            <div nz-col nzSpan="4">
+                <button nz-button nzType="primary" nzShape="round"><i nz-icon nzType="plus" nzTheme="outline"></i>Nuevo Transformador</button>
+            </div>
+        </div>
+    </nz-header>
+    <nz-content>
+        <div class="tabla">
+            <nz-table #nzTable [nzData]="listofEntidad" nzTableLayout="fixed" nzPageSize="5">
+                <thead>
+                    <tr>
+                        <th nzWidth="60px" colspan="2">
+                            <nz-filter-trigger [(nzVisible)]="visible" [nzActive]="searchValue.length > 0" nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu">
+                                <i nz-icon nzType="search"></i>
+                            </nz-filter-trigger>
+                        </th>
+                        <th>Codigo</th>
+                        <th>Descripcion</th>
+                        <th>Tipo</th>
+                        <th>Observacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of nzTable.data">
+                        <td nzWidth="30px">
+                            <button nz-button nzType="primary" nzShape="circle">
+                                <i nz-icon nzType="edit" nzTheme="outline"></i>
+                            </button>
+                        </td>
+                        <td nzWidth="30px">
+                            <button nz-button nzType="primary" nzShape="circle">
+                                <i nz-icon nzType="delete" nzTheme="outline"></i>
+                            </button>
+                        </td>
+                        <td>{{data.codigo}}</td>
+                        <td>{{data.descripcion}}</td>
+                        <td>
+                            <div *ngIf="data.tipo; else tipoFalse">Externo</div>
+                            <ng-template #tipoFalse>Interno</ng-template>
+                        </td>
+                        <td>{{data.observacion}}</td>
+                    </tr>
+                </tbody>
+            </nz-table>
+        </div>
+    </nz-content>
+</nz-layout>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+    <div class="ant-table-filter-dropdown">
+        <div class="search-box">
+            <input type="text" nz-input placeholder="" [(ngModel)]="searchValue" />
+            <button nz-button nzSize="small" nzType="primary" (click)="search()" class="search-button">Buscar</button>
+            <button nz-button nzSize="small" (click)="reset()">Limpiar</button>
+        </div>
+    </div>
+</nz-dropdown-menu>

@@ -1,4 +1,4 @@
-export interface Entidad {
+export interface EntidadModel {
     id: number;
     codigo: string;
     descripcion: string;
@@ -8,7 +8,7 @@ export interface Entidad {
     estado: boolean;
 }
 
-export interface MedidorEntidad {
+export interface MedidorEntidadModel {
     id: number;
     medidorId: number;
     entidadId: number;

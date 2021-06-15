@@ -11,8 +11,8 @@ export class EntidadService {
 
     constructor(private http: HttpClient) { }
 
-    getEntidad() {
-        return this.http.get(`${apiUrl}entidads?filter[where][estado]=true`)
+    getEntidad(tipo) {
+        return this.http.get(`${apiUrl}entidads?filter[where][and][0][estado]=true&filter[where][and][1][entidad]=${tipo}`)
     }
 
     postEntidad(entidad) {
