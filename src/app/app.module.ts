@@ -24,11 +24,15 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { MedidorComponent } from './pages/medidor/medidor.component';
 import { JerarquiaComponent } from './pages/jerarquia/jerarquia.component';
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTableModule, NzTableSortFn, NzTableSortOrder } from 'ng-zorro-antd/table';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { EntradaComponent } from './pages/entrada/entrada.component';
 import { TransformadoresComponent } from './pages/transformadores/transformadores.component';
 import { ConsumidoresComponent } from './pages/consumidores/consumidores.component';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzMessageModule } from 'ng-zorro-antd/message';
 
 registerLocaleData(es);
 
@@ -62,7 +66,11 @@ registerLocaleData(es);
     NzCheckboxModule,
     NzGridModule,
     NzTableModule ,
-    NzDropDownModule  
+    NzDropDownModule,
+    NzModalModule,
+    NzSelectModule,
+    NzPopconfirmModule,
+    NzMessageModule,
   ],
   providers: [{ provide: NZ_I18N, useValue: es_ES }],
   bootstrap: [AppComponent]

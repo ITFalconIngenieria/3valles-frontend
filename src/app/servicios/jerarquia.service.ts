@@ -30,4 +30,8 @@ export class JerarquiaService {
     getVJerarquia() {
         return this.http.get(`${apiUrl}v-jerarquias?filter[where][estado]=true`)
     }
+
+    getDependencia() {
+        return this.http.get(`${apiUrl}v-jerarquias`)
+    }
 }
