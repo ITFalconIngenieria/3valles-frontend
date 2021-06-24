@@ -1,16 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { JerarquiaService } from 'src/app/servicios/jerarquia.service';
-import { JerarquiaModel, vJerarquiaModel } from '../../modelos/jerarquia';
+import { JerarquiaModel, vJerarquiaModel, ColumnItem } from '../../modelos/jerarquia';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzTableSortFn, NzTableSortOrder } from 'ng-zorro-antd/table';
-
-interface ColumnItem {
-  name: string;
-  sortOrder: NzTableSortOrder | null;
-  sortFn: NzTableSortFn | null;
-  sortDirections: NzTableSortOrder[];
-}
 
 @Component({
   selector: 'app-jerarquia',
@@ -119,7 +111,7 @@ export class JerarquiaComponent implements OnInit {
     this.isVisible = false;
   }
 
-  guardar() {
+  guardar():void {
     //   this.validateForm.value.observacion = (this.validateForm.value.observacion === '' || this.validateForm.value.observacion === null) ? 'N/A' : this.validateForm.value.observacion;
 
     this.Datajearaquia = {

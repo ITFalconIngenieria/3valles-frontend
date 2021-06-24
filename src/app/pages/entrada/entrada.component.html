@@ -5,35 +5,38 @@
                 <h1> Entrada de Energia </h1>
             </div>
             <div nz-col nzSpan="4">
-                <button nz-button nzType="primary" nzShape="round"><i nz-icon nzType="plus" nzTheme="outline"></i>Nueva Entrada</button>
+                <button nz-button nzType="primary" (click)="showModal()" nzShape="round"><i nz-icon nzType="plus"
+                        nzTheme="outline"></i>Nueva Entrada</button>
             </div>
         </div>
     </nz-header>
     <nz-content>
         <div class="tabla">
-            <nz-table #nzTable [nzData]="listofEntidad" nzTableLayout="fixed" nzPageSize="5">
+            <nz-table #nzTable [nzData]="listOfDisplayData" nzTableLayout="fixed" nzPageSize="5">
                 <thead>
                     <tr>
                         <th nzWidth="60px" colspan="2">
-                            <nz-filter-trigger [(nzVisible)]="visible" [nzActive]="searchValue.length > 0" nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu">
+                            <nz-filter-trigger [(nzVisible)]="visible" [nzActive]="searchValue.length > 0"
+                                [nzDropdownMenu]="menu">
                                 <i nz-icon nzType="search"></i>
                             </nz-filter-trigger>
                         </th>
-                        <th>Codigo</th>
-                        <th>Descripcion</th>
-                        <th>Tipo</th>
-                        <th>Observacion</th>
+                        <th *ngFor="let column of listOfColumns" [nzSortOrder]="column.sortOrder"
+                            [nzSortFn]="column.sortFn" [nzSortDirections]="column.sortDirections">{{column.name}}</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let data of nzTable.data">
                         <td nzWidth="30px">
-                            <button nz-button nzType="primary" nzShape="circle">
+                            <button nz-button nzType="primary" (click)="editar(data)" nzShape="circle">
                                 <i nz-icon nzType="edit" nzTheme="outline"></i>
                             </button>
                         </td>
                         <td nzWidth="30px">
-                            <button nz-button nzType="primary" nzShape="circle">
+                            <button nz-button nzType="primary" nz-popconfirm
+                                nzPopconfirmTitle="¿Está seguro de borrar el registro?" nzPopconfirmPlacement="bottom"
+                                (nzOnConfirm)="eliminar(data)" (nzOnCancel)="cancel()" nzShape="circle">
                                 <i nz-icon nzType="delete" nzTheme="outline"></i>
                             </button>
                         </td>
@@ -43,7 +46,9 @@
                             <div *ngIf="data.tipo; else tipoFalse">Externo</div>
                             <ng-template #tipoFalse>Interno</ng-template>
                         </td>
-                        <td>{{data.observacion}}</td>
+                        <td nzWidth="30px">
+                            <button nz-button nzType="primary" nzSize="small" nzShape="round">Asignar Medidor</button>
+                        </td>
                     </tr>
                 </tbody>
             </nz-table>
@@ -51,11 +56,60 @@
     </nz-content>
 </nz-layout>
 
+<!-- Modal Formulario -->
+<nz-modal [(nzVisible)]="isVisible" nzTitle="Configuración Entrada Energia" (nzOnCancel)="handleCancel()">
+    <ng-container *nzModalContent>
+        <form nz-form nzLayout="vertical" (ngSubmit)="submitForm()" [formGroup]="validateForm">
+            <div nz-row>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Codigo</nz-form-label>
+                        <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
+                            <input nz-input formControlName="codigo" placeholder="Escribe aquí..." />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="2"></div>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Tipo</nz-form-label>
+                        <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
+                            <nz-radio-group formControlName="tipo">
+                                <label nz-radio nzValue="true">Externo</label>
+                                <label nz-radio nzValue="false">Interno</label>
+                            </nz-radio-group>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <nz-form-item>
+                <nz-form-label>Descripción</nz-form-label>
+                <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
+                    <input nz-input formControlName="descripcion" placeholder="Escribe aquí..." />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label>Observación</nz-form-label>
+                <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
+                    <textarea nz-input formControlName="observacion" placeholder="Escribe aquí..."></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+    </ng-container>
+    <div *nzModalFooter>
+        <button nz-button nzType="default" (click)="handleCancel()">Cancelar</button>
+        <button nz-button nzType="primary" (click)="guardar()" [disabled]="permiso">Guardar</button>
+    </div>
+</nz-modal>
+
 <nz-dropdown-menu #menu="nzDropdownMenu">
     <div class="ant-table-filter-dropdown">
         <div class="search-box">
-            <input type="text" nz-input placeholder="" [(ngModel)]="searchValue" />
-            <button nz-button nzSize="small" nzType="primary" (click)="search()" class="search-button">Buscar</button>
+            <input type="text" nz-input placeholder="Descripción" [(ngModel)]="searchValue"
+                (keydown.enter)="search()" />
+            <button nz-button nzSize="small" nzType="primary" (click)="search()" class="search-button">
+                Buscar
+            </button>
             <button nz-button nzSize="small" (click)="reset()">Limpiar</button>
         </div>
     </div>

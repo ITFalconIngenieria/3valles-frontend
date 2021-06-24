@@ -1,22 +1,21 @@
-export interface MedidorModel{
-    id:number;
-    codigo: string;
-    variableId: number;
-    lecturaMax: any;
-    multiplicador: any;
-    observacion: string;
-    estado: boolean;
+import { NzTableSortFn, NzTableSortOrder } from 'ng-zorro-antd/table';
+
+export interface ColumnItem {
+  name: string;
+  sortOrder: NzTableSortOrder | null;
+  sortFn: NzTableSortFn | null;
+  sortDirections: NzTableSortOrder[];
 }
 
-export interface vMedidorModel{
+export interface MedidorModel{
     id:number;
-    codigo: string;
-    variableId: number;
+    sourceId: number;
+    descripcion: string;
     lecturaMax: any;
     multiplicador: any;
     observacion: string;
+    tipo: boolean;
     estado: boolean;
-    variable:string;
 }
 
 export interface RolloverModel{

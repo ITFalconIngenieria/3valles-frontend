@@ -1,3 +1,5 @@
+import { NzTableSortFn, NzTableSortOrder } from 'ng-zorro-antd/table';
+
 export interface EntidadModel {
     id: number;
     codigo: string;
@@ -18,3 +20,10 @@ export interface MedidorEntidadModel {
     observacion: string;
     estado: boolean;
 }
+
+export interface ColumnItem {
+    name: string;
+    sortOrder: NzTableSortOrder | null;
+    sortFn: NzTableSortFn | null;
+    sortDirections: NzTableSortOrder[];
+  }

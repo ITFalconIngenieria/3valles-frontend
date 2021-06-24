@@ -1,3 +1,5 @@
+import { NzTableSortFn, NzTableSortOrder } from 'ng-zorro-antd/table';
+
 export interface JerarquiaModel {
     id: number;
     descripcion: string;
@@ -12,3 +14,10 @@ export interface vJerarquiaModel{
     estado: boolean;
     herencia: string;
 }
+
+export interface ColumnItem {
+    name: string;
+    sortOrder: NzTableSortOrder | null;
+    sortFn: NzTableSortFn | null;
+    sortDirections: NzTableSortOrder[];
+  }

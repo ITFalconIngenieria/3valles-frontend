@@ -33,6 +33,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 
 registerLocaleData(es);
 
@@ -71,6 +72,7 @@ registerLocaleData(es);
     NzSelectModule,
     NzPopconfirmModule,
     NzMessageModule,
+    NzRadioModule
   ],
   providers: [{ provide: NZ_I18N, useValue: es_ES }],
   bootstrap: [AppComponent]
