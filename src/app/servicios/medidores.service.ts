@@ -13,7 +13,7 @@ export class MedidorService {
         private http: HttpClient
     ) { }
 
-    // Medidpres
+    // Medidores
 
     getMedidor() {
         return this.http.get(`${apiUrl}medidors`);
@@ -56,4 +56,8 @@ export class MedidorService {
         return this.http.patch(`${apiUrl}roll-overs/${id}`, rollover);
     }
 
+    // Vista a PME
+    getMedidorPME() {
+        return this.http.get(`${apiUrl}v-medidor-pmes`);
+    }
 }

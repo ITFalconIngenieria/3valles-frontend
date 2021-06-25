@@ -28,3 +28,8 @@ export interface RolloverModel{
     observacion: string;
     estado: boolean;
   }
+
+  export interface PMEMedidorModel{
+    id: number;
+    descripcion: string;
+  }

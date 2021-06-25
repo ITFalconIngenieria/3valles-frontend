@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MedidorService } from 'src/app/servicios/medidores.service';
-import { MedidorModel, ColumnItem } from '../../modelos/medidor';
+import { MedidorModel, ColumnItem, PMEMedidorModel } from '../../modelos/medidor';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
@@ -18,10 +18,11 @@ export class MedidorComponent implements OnInit {
   accion: string;
 
   medidorEdit;
-  Datamedidor;
+  dataMedidor;
 
-  listofMedidor: MedidorModel[]=[];
+  listofMedidor: MedidorModel[] = [];
   listOfDisplayData: MedidorModel[] = [];
+  listOfPME: PMEMedidorModel[] = [];
 
   listOfColumns: ColumnItem[] = [
     {
@@ -39,23 +40,23 @@ export class MedidorComponent implements OnInit {
     {
       name: 'Tipo',
       sortOrder: null,
-      sortFn: (a: any, b: any) => a.tipo-b.tipo,
+      sortFn: (a: any, b: any) => a.tipo - b.tipo,
       sortDirections: ['ascend', 'descend', null],
     },
     {
       name: 'Disponible',
       sortOrder: null,
-      sortFn: (a: any, b: any) => a.estado-b.estado,
+      sortFn: (a: any, b: any) => a.estado - b.estado,
       sortDirections: ['ascend', 'descend', null],
     }
   ];
 
   constructor(
-    private fb:FormBuilder,
+    private fb: FormBuilder,
     private medidorService: MedidorService,
     private nzMessageService: NzMessageService
   ) { }
-  
+
   onExpandChange(id: any, checked: boolean): void {
     if (checked) {
       this.expandSet.add(id);
@@ -84,8 +85,8 @@ export class MedidorComponent implements OnInit {
   ngOnInit(): void {
     this.accion = 'new';
     this.medidorService.getMedidor().toPromise().then(
-      (data : MedidorModel[]) => {
-        this.listofMedidor=data;
+      (data: MedidorModel[]) => {
+        this.listofMedidor = data;
         this.listOfDisplayData = [...this.listofMedidor];
       },
       (error) => {
@@ -93,6 +94,17 @@ export class MedidorComponent implements OnInit {
         console.log(error);
       }
     );
+
+    this.medidorService.getMedidorPME().toPromise().then(
+      (data: PMEMedidorModel[]) => {
+        this.listOfPME = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    );
+
     this.limpiar();
   }
 
@@ -110,13 +122,73 @@ export class MedidorComponent implements OnInit {
     this.isVisible = false;
   }
 
-  guardar():void {
+  guardar(): void {
+    this.dataMedidor = {
+      sourceId: (this.validateForm.value.sourceId === null || this.validateForm.value.sourceId === undefined)?0:this.validateForm.value.sourceId,
+      descripcion: (this.validateForm.value.descripcion === '' || this.validateForm.value.descripcion === undefined) ? 'N/A' : this.validateForm.value.descripcion,
+      lecturaMax: (this.validateForm.value.lecturaMax === null || this.validateForm.value.lecturaMax === undefined) ? '0' : this.validateForm.value.lecturaMax+'',
+      multiplicador: (this.validateForm.value.multiplicador ===null || this.validateForm.value.multiplicador === undefined) ? '1' : this.validateForm.value.multiplicador+'',
+      observacion: (this.validateForm.value.observacion === null ||this.validateForm.value.observacion === '' || this.validateForm.value.observacion === undefined) ? 'N/A' : this.validateForm.value.observacion,
+      tipo: (this.validateForm.value.tipo === 'true') ? true : false,
+      estado: true
+    }
 
+    if (this.accion === 'editar') {
+      this.medidorService.putMedidor(this.medidorEdit, this.dataMedidor)
+        .toPromise()
+        .then((data: MedidorModel) => {
+          for (const item of this.listofMedidor.filter(x => x.id === this.medidorEdit)) {
+            item.sourceId = this.dataMedidor.sourceId;
+            item.descripcion = this.dataMedidor.descripcion;
+            item.lecturaMax = this.dataMedidor.lecturaMax;
+            item.multiplicador = this.dataMedidor.multiplicador;
+            item.observacion = this.dataMedidor.observacion;
+            item.tipo = this.dataMedidor.tipo;
+            item.estado = this.dataMedidor.estado;
+          }
+          this.accion = 'new';
+          this.limpiar();
+          this.isVisible = false;
+          this.nzMessageService.success('El registro fue guardado con éxito');
+        },
+          (error) => {
+            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+            console.log(error);
+            this.limpiar();
+            this.accion = 'new';
+            this.isVisible = false;
+          }
+        )
+    } else {
+      this.medidorService.postMedidor(this.dataMedidor)
+        .toPromise()
+        .then((data: MedidorModel) => {
+          this.listofMedidor = [...this.listofMedidor, data];
+          this.listOfDisplayData = [...this.listofMedidor];
+          this.nzMessageService.success('El registro fue guardado con éxito');
+        },
+          (error) => {
+            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+            console.log(error);
+            this.limpiar();
+          }
+        )
+    }
+    this.isVisible = false;
   }
 
   editar(data): void {
     this.accion = 'editar';
     this.isVisible = true;
+    this.medidorEdit = data.id;
+    this.validateForm = this.fb.group({
+      sourceId: [data.sourceId, [Validators.required]],
+      descripcion: [data.descripcion],
+      lecturaMax: [data.lecturaMax],
+      multiplicador: [data.multiplicador],
+      observacion: [data.observacion],
+      tipo: [(data.tipo === false) ? 'false' : 'true']
+    })
   }
 
   eliminar(data): void {
@@ -138,8 +210,12 @@ export class MedidorComponent implements OnInit {
 
   limpiar() {
     this.validateForm = this.fb.group({
-      descripcion: ['', [Validators.required]],
-      dependenciaId: [null],
+      sourceId: [null, [Validators.required]],
+      descripcion: [''],
+      lecturaMax: [null],
+      multiplicador: [null],
+      observacion: [''],
+      tipo: ['true']
     });
   }
 }
