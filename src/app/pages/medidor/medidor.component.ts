@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MedidorService } from 'src/app/servicios/medidores.service';
-import { MedidorModel, ColumnItem, PMEMedidorModel } from '../../modelos/medidor';
+import { MedidorModel, ColumnItem, PMEMedidorModel, RolloverModel, variableModel } from '../../modelos/medidor';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
@@ -12,17 +12,25 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class MedidorComponent implements OnInit {
   expandSet = new Set<any>();
   isVisible = false;
+  isVisibleRollover = false;
   validateForm: FormGroup;
+  validateFormRollover: FormGroup;
   searchValue = '';
   visible = false;
   accion: string;
-
+  permiso: any;
+  idMedidor
+  idRollover;
+  codigoMedidor;
   medidorEdit;
   dataMedidor;
 
   listofMedidor: MedidorModel[] = [];
   listOfDisplayData: MedidorModel[] = [];
   listOfPME: PMEMedidorModel[] = [];
+  listOfVariable: variableModel[] = [];
+  listOfDataRollover: RolloverModel[] = [];
+  listOfDataRolloverMedidor: RolloverModel[] = [];
 
   listOfColumns: ColumnItem[] = [
     {
@@ -96,9 +104,15 @@ export class MedidorComponent implements OnInit {
     );
 
     this.medidorService.getMedidorPME().toPromise().then(
-      (data: PMEMedidorModel[]) => {
-        this.listOfPME = data;
-      },
+      (data: PMEMedidorModel[]) => this.listOfPME = data,
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    );
+
+    this.medidorService.getRollover().toPromise().then(
+      (data: RolloverModel[])=> this.listOfDataRollover =data,
       (error) => {
         this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
         console.log(error);
@@ -124,11 +138,11 @@ export class MedidorComponent implements OnInit {
 
   guardar(): void {
     this.dataMedidor = {
-      sourceId: (this.validateForm.value.sourceId === null || this.validateForm.value.sourceId === undefined)?0:this.validateForm.value.sourceId,
+      sourceId: (this.validateForm.value.sourceId === null || this.validateForm.value.sourceId === undefined) ? 0 : this.validateForm.value.sourceId,
       descripcion: (this.validateForm.value.descripcion === '' || this.validateForm.value.descripcion === undefined) ? 'N/A' : this.validateForm.value.descripcion,
-      lecturaMax: (this.validateForm.value.lecturaMax === null || this.validateForm.value.lecturaMax === undefined) ? '0' : this.validateForm.value.lecturaMax+'',
-      multiplicador: (this.validateForm.value.multiplicador ===null || this.validateForm.value.multiplicador === undefined) ? '1' : this.validateForm.value.multiplicador+'',
-      observacion: (this.validateForm.value.observacion === null ||this.validateForm.value.observacion === '' || this.validateForm.value.observacion === undefined) ? 'N/A' : this.validateForm.value.observacion,
+      lecturaMax: (this.validateForm.value.lecturaMax === null || this.validateForm.value.lecturaMax === undefined) ? '0' : this.validateForm.value.lecturaMax + '',
+      multiplicador: (this.validateForm.value.multiplicador === null || this.validateForm.value.multiplicador === undefined) ? '1' : this.validateForm.value.multiplicador + '',
+      observacion: (this.validateForm.value.observacion === null || this.validateForm.value.observacion === '' || this.validateForm.value.observacion === undefined) ? 'N/A' : this.validateForm.value.observacion,
       tipo: (this.validateForm.value.tipo === 'true') ? true : false,
       estado: true
     }
@@ -217,5 +231,182 @@ export class MedidorComponent implements OnInit {
       observacion: [''],
       tipo: ['true']
     });
+  }
+
+  //ROLLOVER
+
+  showModalRollover(data): void {
+    this.isVisibleRollover = true;
+    this.codigoMedidor = data.sourceId + ' - ' + data.descripcion;
+    this.idMedidor = data.id;
+    this.listOfDataRolloverMedidor = this.listOfDataRollover.filter(x => x.medidorId === this.idMedidor);
+
+    this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
+      (data: variableModel[]) => {
+        this.listOfVariable = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    );
+  }
+
+  handleCancelRollover(): void {
+    this.accion = 'new';
+    this.isVisibleRollover = false;
+    this.limpiarRollover();
+  }
+
+  handleOkRollover(): void {
+    this.limpiarRollover()
+    this.isVisibleRollover = false;
+  }
+
+  limpiarRollover() {
+    this.validateFormRollover = this.fb.group({
+      fecha: [null, [Validators.required]],
+      variableMedidorId: [null, [Validators.required]],
+      lecturaAnterior: [0, [Validators.required]],
+      lecturaNueva: [0, [Validators.required]],
+      observacion: ['']
+    });
+  }
+
+  guardarRollover() {
+    /* tslint:disable-next-line: max-line-length
+    const observacion = (this.validateForm.value.observacion === '' || this.validateForm.value.observacion === null) ? 'N/A' : this.validateForm.value.observacion;
+    // this.validateForm.value.fecha = moment(this.validateForm.value.fecha).format('YYYY-MM-DD HH:mm:ss')
+    const dataRollover = {
+      medidorId: this.idMedidor,
+      fecha: moment(this.validateForm.value.fecha).toISOString(),
+      energia: (this.validateForm.value.energia === 'false') ? false : true,
+      lecturaAnterior: `${this.validateForm.value.lecturaAnterior}`,
+      lecturaNueva: `${this.validateForm.value.lecturaNueva}`,
+      observacion,
+      estado: true
+    };
+
+    if (this.accion === 'editar') {
+      this.medidoresService.putRollovers(this.idRollover, dataRollover)
+        .toPromise()
+        .then(
+          () => {
+
+            this.ShowNotification(
+              'success',
+              'Guardado con éxito',
+              'El registro fue guardado con éxito'
+            );
+            for (const item of this.listOfDataRolloverMedidor.filter(x => x.id === this.idRollover)) {
+              item.medidorId = dataRollover.medidorId;
+              item.fecha = dataRollover.fecha;
+              item.energia = dataRollover.energia;
+              item.lecturaAnterior = dataRollover.lecturaAnterior;
+              item.lecturaNueva = dataRollover.lecturaNueva;
+              item.observacion = dataRollover.observacion;
+              item.estado = dataRollover.estado;
+            }
+            for (const item of this.listOfDataRollover.filter(x => x.id === this.idRollover)) {
+              item.medidorId = dataRollover.medidorId;
+              item.fecha = dataRollover.fecha;
+              item.energia = dataRollover.energia;
+              item.lecturaAnterior = dataRollover.lecturaAnterior;
+              item.lecturaNueva = dataRollover.lecturaNueva;
+              item.observacion = dataRollover.observacion;
+              item.estado = dataRollover.estado;
+            }
+
+            this.accion = 'new';
+            this.limpiarRollover();
+
+          },
+          (error) => {
+            this.ShowNotification(
+              'error',
+              'No se pudo guardar',
+              'El registro no pudo ser guardado, por favor revise los datos ingresados sino comuníquese con el proveedor.'
+            );
+            this.accion = 'new';
+            this.limpiarRollover();
+            console.log(error);
+
+          }
+        );
+    } else {
+      this.medidoresService.postRollovers(dataRollover)
+        .toPromise()
+        .then(
+          (data: any) => {
+
+            this.ShowNotification(
+              'success',
+              'Guardado con éxito',
+              'El registro fue guardado con éxito'
+            );
+            this.listOfDataRolloverMedidor = [...this.listOfDataRolloverMedidor,
+            {
+              energia: data.energia,
+              estado: data.estado,
+              fecha: data.fecha,
+              id: data.id,
+              lecturaAnterior: data.lecturaAnterior,
+              lecturaNueva: data.lecturaNueva,
+              medidorId: data.medidorId,
+              observacion: data.observacion
+            }];
+            this.listOfDataRollover = [...this.listOfDataRollover,
+            {
+              energia: data.energia,
+              estado: data.estado,
+              fecha: data.fecha,
+              id: data.id,
+              lecturaAnterior: data.lecturaAnterior,
+              lecturaNueva: data.lecturaNueva,
+              medidorId: data.medidorId,
+              observacion: data.observacion
+            }];
+            this.limpiarRollover();
+
+          },
+          (error) => {
+            this.ShowNotification(
+              'error',
+              'No se pudo guardar',
+              'El registro no pudo ser guardado, por favor revise los datos ingresados sino comuníquese con el proveedor.'
+            );
+            this.limpiarRollover();
+            console.log(error);
+          }
+        );
+    }*/
+  }
+
+  editarRollover(data) {
+    this.idRollover = data.id;
+    this.accion = 'editar';
+    this.validateFormRollover = this.fb.group({
+      fecha: [data.fecha],
+      variableMedidorId: [data.variableMedidorId],
+      lecturaAnterior: [data.lecturaAnterior],
+      lecturaNueva: [data.lecturaNueva],
+      observacion: [data.observacion]
+    });
+  }
+
+  eliminarRollover(data) {
+    this.medidorService.deleteRollover(data.id, { estado: false })
+      .toPromise()
+      .then(
+        () => {
+          this.nzMessageService.success('El registro fue eliminado con éxito');
+          this.listOfDataRolloverMedidor = this.listOfDataRolloverMedidor.filter(x => x.id !== data.id);
+          this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
+        },
+        (error) => {
+          this.nzMessageService.warning('El registro no pudo ser eleminado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+        }
+      );
   }
 }

@@ -33,3 +33,10 @@ export interface RolloverModel{
     id: number;
     descripcion: string;
   }
+
+  export interface variableModel{
+    id:number;
+    medidorId:number;
+    quantityId: number;
+    name: string;
+  }

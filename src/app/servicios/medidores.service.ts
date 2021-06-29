@@ -60,4 +60,10 @@ export class MedidorService {
     getMedidorPME() {
         return this.http.get(`${apiUrl}v-medidor-pmes`);
     }
+
+    //Variables Medidor
+    getVariablesPME(id) {
+        return this.http.get(`${apiUrl}v-variables-medidors?filter[where][medidorId]=${id}`);
+    }
+
 }
