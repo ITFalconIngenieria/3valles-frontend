@@ -1,9 +1,9 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { registerLocaleData } from '@angular/common';
-import es from '@angular/common/locales/es';
+import en from '@angular/common/locales/en';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -12,8 +12,7 @@ import { IconsProviderModule } from './icons-provider.module';
 import { MenuComponent } from './pages/menu/menu.component';
 import { LoginComponent } from './pages/login/login.component';
 //ng-zorro
-import { NZ_I18N } from 'ng-zorro-antd/i18n';
-import { es_ES } from 'ng-zorro-antd/i18n';
+import { en_US,NZ_I18N } from 'ng-zorro-antd/i18n';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -36,9 +35,11 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+//import { NzI18nService } from 'ng-zorro-antd/i18n';
+//import { enUS, ja } from 'date-fns/locale';
 
 
-registerLocaleData(es);
+registerLocaleData(en);
 
 @NgModule({
   declarations: [
@@ -79,7 +80,22 @@ registerLocaleData(es);
     NzInputNumberModule,
     NzDatePickerModule 
   ],
-  providers: [{ provide: NZ_I18N, useValue: es_ES }],
+  providers: [
+    { provide: NZ_I18N, 
+      useFactory: (localId: string) => {
+        switch (localId) {
+          case 'en':
+            return en_US;
+          default:
+              return en_US;
+          }
+      },
+      deps: [LOCALE_ID]
+    }
+ //   { provide: NZ_I18N, useValue: enUS }
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+ // constructor(private i18n: NzI18nService) { }
+ }

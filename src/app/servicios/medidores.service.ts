@@ -41,7 +41,11 @@ export class MedidorService {
     }
 
     getRolloverMedidor(id) {
-        return this.http.get(`${apiUrl} roll-overs?filter[where][medidorId]=${id}`);
+        return this.http.get(`${apiUrl}roll-overs?filter[where][medidorId]=${id}`);
+    }
+
+    getVariableMedidorRollover(id){
+        return this.http.get(`${apiUrl}variable-medidors?filter={"where":{"medidorId": "${id}"},"include":[{"relation": "rollOvers"}]}`);
     }
 
     postRollover(rollover) {

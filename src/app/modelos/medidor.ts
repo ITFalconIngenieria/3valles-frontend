@@ -20,8 +20,8 @@ export interface MedidorModel{
 
 export interface RolloverModel{
     id: number;
-    medidorId: number;
     fecha: string;
+    variableMedidorId: number;
     energia:number;
     lecturaAnterior: any;
     lecturaNueva: any;
@@ -36,7 +36,9 @@ export interface RolloverModel{
 
   export interface variableModel{
     id:number;
+    variableMedidorId:number;
     medidorId:number;
     quantityId: number;
     name: string;
+    variableId:number;
   }

@@ -141,7 +141,7 @@
 <nz-modal [(nzVisible)]="isVisibleRollover" nzTitle="Configuración Rollover" nzWidth="40%"
     (nzOnCancel)="handleCancelRollover()">
     <ng-container *nzModalContent>
-        <form nz-form nzLayout="vertical" (ngSubmit)="submitForm()" [formGroup]="validateFormRollover">
+        <form nz-form nzLayout="vertical" (ngSubmit)="submitFormRollover()" [formGroup]="validateFormRollover">
             <h5> Configuración del Rollover </h5>
             <nz-form-item>
                 <nz-form-label>Código del medidor</nz-form-label>
@@ -155,7 +155,7 @@
                     <nz-form-item>
                         <nz-form-label>Fecha de Rollover</nz-form-label>
                         <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
-                            <nz-date-picker [nzShowTime]="{ nzFormat: 'HH:mm' }" formControlName="fecha"
+                            <nz-date-picker [nzShowTime]="{ nzFormat: 'HH:mm' }"  formControlName="fecha"
                                 nzFormat="yyyy-MM-dd HH:mm"></nz-date-picker>
                         </nz-form-control>
                     </nz-form-item>
@@ -167,7 +167,7 @@
                         <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
                             <nz-select formControlName="variableMedidorId" placeholder="Seleccione una..." nzShowSearch
                                 nzAllowClear>
-                                <nz-option *ngFor="let variable of listOfVariable" [nzValue]="variable.id"
+                                <nz-option *ngFor="let variable of listOfVariable" [nzValue]="variable.variableMedidorId"
                                     [nzLabel]="variable.name">
                                 </nz-option>
                             </nz-select>
@@ -245,7 +245,7 @@
                         <tr>
                             <td [nzExpand]="expandSet.has(data.id)" nzShowExpand="true"
                                 (nzExpandChange)="onExpandChange(data.id, $event)"></td>
-                            <td>{{ data.fecha | date:'dd/M/yyyy'}}</td>
+                            <td>{{ data.fecha | date:'dd/M/yyyy':'+0600'}}</td>
                             <td>{{ data.lecturaAnterior | number:'':'en_US'}}</td>
                             <td>{{ data.lecturaNueva | number:'':'en_US'}}</td>
                             <td>
