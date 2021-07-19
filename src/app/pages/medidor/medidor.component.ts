@@ -34,6 +34,7 @@ export class MedidorComponent implements OnInit {
   listOfDisplayData: MedidorModel[] = [];
   listOfPME: PMEMedidorModel[] = [];
   listOfVariable: variableModel[] = [];
+  listOfVariablePME: variableModel[] = [];
  // listOfDataRollover: RolloverModel[] = [];
   listOfDataRolloverMedidor: RolloverModel[] = [];
 
@@ -133,6 +134,7 @@ export class MedidorComponent implements OnInit {
     */
     this.limpiar();
     this.limpiarRollover();
+    this.limpiarVariables();
   }
 
   showModal(): void {
@@ -392,6 +394,26 @@ export class MedidorComponent implements OnInit {
     //Variables
     showModalVariable(data): void {
       this.isVisibleVariable = true;
+
+      this.medidorService.getVariable().toPromise().then(
+        (data: variableModel[]) => {
+          this.listOfVariable = data;
+        },
+        (error) => {
+          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          console.log(error);
+        }
+      );
+
+      this.medidorService.getVariablePME().toPromise().then(
+        (data: variableModel[]) => {
+          this.listOfVariablePME = data;
+        },
+        (error) => {
+          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          console.log(error);
+        }
+      );
     }
 
     handleCancelVariables(): void {
@@ -405,11 +427,23 @@ export class MedidorComponent implements OnInit {
       this.isVisibleVariable = false;
     }
 
-    limpiarVariables() {}
+    limpiarVariables() {
+      this.validateFormVariable = this.fb.group({
+        variableId: [null, [Validators.required]],
+        quantityId: [null, [Validators.required]]
+      });
+    }
 
     guardarVariables() {}
 
     editarVariables(data) {}
 
     eliminarVariables(data) {}
+
+    submitFormVariable(): void {
+      for (const i in this.validateFormVariable.controls) {
+        this.validateFormVariable.controls[i].markAsDirty();
+        this.validateFormVariable.controls[i].updateValueAndValidity();
+      }
+    }
 }
