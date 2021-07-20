@@ -78,4 +78,16 @@ export class MedidorService {
     getVariablePME(){
         return this.http.get(`${apiUrl}v-variable-pmes`);
     }
+
+    deleteVariable(id, variable) {
+        return this.http.patch(`${apiUrl}variable-medidors/${id}`, variable);
+    }
+
+    putVariable(id, variable) {
+        return this.http.put(`${apiUrl}variable-medidors/${id}`, variable);
+    }
+
+    postVariable(variable) {
+        return this.http.post(`${apiUrl}variable-medidors`, variable);
+    }
 }

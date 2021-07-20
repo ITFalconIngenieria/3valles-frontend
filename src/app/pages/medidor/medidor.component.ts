@@ -32,7 +32,7 @@ export class MedidorComponent implements OnInit {
 
   listofMedidor: MedidorModel[] = [];
   listOfDisplayData: MedidorModel[] = [];
-  listOfPME: PMEMedidorModel[] = [];
+  listOfPME: any[] = [];
   listOfVariable: variableModel[] = [];
   listOfVariablePME: variableModel[] = [];
  // listOfDataRollover: RolloverModel[] = [];
@@ -350,12 +350,12 @@ export class MedidorComponent implements OnInit {
           (data:RolloverModel) => {
             this.listOfDataRolloverMedidor = [...this.listOfDataRolloverMedidor, data];
             this.nzMessageService.success('El registro fue guardado con éxito');
-            this.limpiar();
+            this.limpiarRollover();
           },
           (error) => {
             this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
             console.log(error);
-            this.limpiar();
+            this.limpiarRollover();
           }
         )
     }
@@ -445,11 +445,82 @@ export class MedidorComponent implements OnInit {
       });
     }
 
-    guardarVariables() {}
+    guardarVariables() {
+      const dataVariable ={
+        medidorId: this.idMedidor,
+        variableId: this.validateFormVariable.value.variableId,
+        quantityId: this.validateFormVariable.value.quantityId,
+        estado: true
+      }
 
-    editarVariables(data) {}
+      if (this.accion === 'editar') {
+        this.medidorService
+        .putVariable(this.idVariable,dataVariable)
+        .toPromise()
+        .then(
+          (datar:any) => {
+            for (const item of this.listOfPME.filter(x => x.id === this.idVariable)) {
+              item.id=datar.id;
+              item.variableMedidorId = datar.variableMedidorId;
+              item.medidorId = datar.medidorId;
+              item.quantityId = datar.quantityId;
+              item.name = datar.name;
+              item.variableId = datar.variableId;
+              item.descripcion = datar.descripcion;
+            }
+            this.accion = 'new';
+            this.limpiarVariables();
+            this.isVisible = false;
+            this.nzMessageService.success('El registro fue guardado con éxito');
+          }, (error) => {
+            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+            console.log(error);
+            this.limpiarVariables();
+            this.accion = 'new';
+            this.isVisible = false;
+          }
+        )
+      }else{
+        this.medidorService.postVariable(dataVariable).toPromise().then(
+          (data) => {
+            this.listOfPME = [...this.listOfPME, data];
+            this.nzMessageService.success('El registro fue guardado con éxito');
+            this.limpiarVariables();
+          },
+          (error) => {
+            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+            console.log(error);
+            this.limpiarVariables();
+          }
+        )
+      }
+    }
 
-    eliminarVariables(data) {}
+    editarVariables(data) {
+      this.idVariable = data.id;
+      this.accion = 'editar';
+  
+      this.validateFormVariable = this.fb.group({
+        variableId: [data.variableId, [Validators.required]],
+        quantityId: [data.quantityId, [Validators.required]],
+      });
+    }
+
+    eliminarVariables(data) {
+      this.medidorService.deleteVariable(data.id, { estado: false })
+      .toPromise()
+      .then(
+        () => {
+          this.nzMessageService.success('El registro fue eliminado con éxito');
+          this.listOfPME = this.listOfPME.filter(x => x.id !== data.id);
+        //  this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
+        },
+        (error) => {
+          this.nzMessageService.warning('El registro no pudo ser eleminado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+        }
+      );
+    }
 
     submitFormVariable(): void {
       for (const i in this.validateFormVariable.controls) {

@@ -324,7 +324,6 @@
            <nz-table #nzTableRollover [nzData]="listOfPME" nzTableLayout="fixed" nzPageSize="4">
                 <thead>
                     <tr>
-                        <th nzWidth="60px"></th>
                         <th>Variable Energetica</th>
                         <th>Referencia en PME</th>
                         <th nzWidth="10%"></th>
@@ -334,19 +333,17 @@
                 <tbody>
                     <ng-container *ngFor="let data of nzTableRollover.data">
                         <tr>
-                            <td [nzExpand]="expandSet.has(data.id)" nzShowExpand="true"
-                                (nzExpandChange)="onExpandChange(data.id, $event)"></td>
-                            <td>{{ data.descripcion}}</td>
-                            <td>{{ data.name}}</td>
+                            <td>{{ data.variableId + ' - ' + data.descripcion}}</td>
+                            <td>{{ data.quantityId + ' - ' + data.name}}</td>
                             <td>
-                                <button nz-button nzType="primary" (click)="editarRollover(data)" nzShape="circle">
+                                <button nz-button nzType="primary" (click)="editarVariables(data)" nzShape="circle">
                                     <i nz-icon nzType="edit" nzTheme="outline"></i>
                                 </button>
                             </td>
                             <td>
                                 <button nz-button nzType="primary" nz-popconfirm
                                 nzPopconfirmTitle="¿Está seguro de borrar el registro?" nzPopconfirmPlacement="bottom" 
-                                (nzOnConfirm)="eliminarRollover(data)" (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si"> 
+                                (nzOnConfirm)="eliminarVariables(data)" (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si"> 
                                     <i nz-icon nzType="delete" nzTheme="outline"></i>
                                 </button>
                             </td>
@@ -357,7 +354,7 @@
         </div>
     </ng-container>
     <div *nzModalFooter>
-        <button nz-button nzType="primary" (click)="handleOkRollover()">OK</button>
+        <button nz-button nzType="primary" (click)="handleOkVariables()">OK</button>
     </div>
 </nz-modal>
 
