@@ -394,6 +394,7 @@ export class MedidorComponent implements OnInit {
     //Variables
     showModalVariable(data): void {
       this.isVisibleVariable = true;
+      this.idMedidor = data.id;
 
       this.medidorService.getVariable().toPromise().then(
         (data: variableModel[]) => {
@@ -408,6 +409,16 @@ export class MedidorComponent implements OnInit {
       this.medidorService.getVariablePME().toPromise().then(
         (data: variableModel[]) => {
           this.listOfVariablePME = data;
+        },
+        (error) => {
+          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          console.log(error);
+        }
+      );
+
+      this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
+        (data: variableModel[]) => {
+          this.listOfPME = data;
         },
         (error) => {
           this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');

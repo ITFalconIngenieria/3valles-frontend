@@ -321,13 +321,12 @@
         <br>
         <div style="background-color: #f3f9ff; padding: 15px;">
             <h4> Listado de Variables </h4>
-           <!-- <nz-table #nzTableRollover [nzData]="listOfDataRolloverMedidor" nzTableLayout="fixed" nzPageSize="4">
+           <nz-table #nzTableRollover [nzData]="listOfPME" nzTableLayout="fixed" nzPageSize="4">
                 <thead>
                     <tr>
                         <th nzWidth="60px"></th>
-                        <th>Fecha rollover</th>
-                        <th>Ultima lectura</th>
-                        <th>Nueva lectura</th>
+                        <th>Variable Energetica</th>
+                        <th>Referencia en PME</th>
                         <th nzWidth="10%"></th>
                         <th nzWidth="10%"></th>
                     </tr>
@@ -337,9 +336,8 @@
                         <tr>
                             <td [nzExpand]="expandSet.has(data.id)" nzShowExpand="true"
                                 (nzExpandChange)="onExpandChange(data.id, $event)"></td>
-                            <td>{{ data.fecha | date:'yyyy-MM-dd':'+0600'}}</td>
-                            <td>{{ data.lecturaAnterior | number:'':'en_US'}}</td>
-                            <td>{{ data.lecturaNueva | number:'':'en_US'}}</td>
+                            <td>{{ data.descripcion}}</td>
+                            <td>{{ data.name}}</td>
                             <td>
                                 <button nz-button nzType="primary" (click)="editarRollover(data)" nzShape="circle">
                                     <i nz-icon nzType="edit" nzTheme="outline"></i>
@@ -353,13 +351,9 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr [nzExpand]="expandSet.has(data.id)">
-                            <td colSpan="7"><span style="color: black; font-weight: bold;"> Observación: </span>
-                                {{data.observacion }}</td>
-                        </tr>
                     </ng-container>
                 </tbody>
-            </nz-table>-->
+            </nz-table>
         </div>
     </ng-container>
     <div *nzModalFooter>

@@ -41,4 +41,5 @@ export interface RolloverModel{
     quantityId: number;
     name: string;
     variableId:number;
+    descripcion:string;
   }
