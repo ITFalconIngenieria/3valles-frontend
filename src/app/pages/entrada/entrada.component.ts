@@ -108,12 +108,14 @@ export class EntradaComponent implements OnInit {
   }
 
   guardar(): void {
+    const observacion = (this.validateForm.value.observacion === '' || this.validateForm.value.observacion === null) ? 'N/A' : this.validateForm.value.observacion;
+
     this.dataEntrada = {
       codigo: this.validateForm.value.codigo,
       descripcion: this.validateForm.value.descripcion,
       tipo: (this.validateForm.value.tipo === 'true') ? true:false,
       entidad: 1,
-      observacion: this.validateForm.value.observacion,
+      observacion: observacion,
       estado: true
     }
 

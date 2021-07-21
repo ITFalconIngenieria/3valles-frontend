@@ -42,4 +42,5 @@ export interface RolloverModel{
     name: string;
     variableId:number;
     descripcion:string;
+    medidor:string;
   }

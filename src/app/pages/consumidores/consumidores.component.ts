@@ -2,7 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
 import { EntidadModel, ColumnItem  } from 'src/app/modelos/entidad';
 import { EntidadService } from 'src/app/servicios/entidad.service';
+import { MedidorService } from 'src/app/servicios/medidores.service';
+import { JerarquiaService } from 'src/app/servicios/jerarquia.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { MedidorEntidadModel } from '../../modelos/entidad';
+import { JerarquiaModel } from '../../modelos/jerarquia';
+import { variableModel } from '../../modelos/medidor';
 
 @Component({
   selector: 'app-consumidores',
@@ -12,16 +17,27 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class ConsumidoresComponent implements OnInit {
   expandSet = new Set<any>();
   isVisible = false;
+  isVisibleTransformacion = false;
+  visibleDrawer=false;
+
   validateForm: FormGroup;
+  validateFormMedidores: FormGroup;
   searchValue = '';
   visible = false;
+
   accion: string;
+  accionMedidor:string;
+  accionTransformacion:string;
+  idMedidor:number;
 
   entradaEdit;
   dataEntrada;
 
   listofEntidad: EntidadModel[] = [];
   listOfDisplayData: EntidadModel[] = [];
+  listofMedidor: MedidorEntidadModel[] = [];
+  listofJerarquia: JerarquiaModel[]=[];
+  listofVariableMedidor: variableModel[]=[];
 
   listOfColumns: ColumnItem[] = [
     {
@@ -47,6 +63,8 @@ export class ConsumidoresComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private entidadService: EntidadService,
+    private jerarquiaService:JerarquiaService,
+    private medidorService:MedidorService,
     private nzMessageService: NzMessageService
   ) { }
 
@@ -88,6 +106,8 @@ export class ConsumidoresComponent implements OnInit {
       }
     );
     this.limpiar();
+    this.limpiarMedidor();
+    this.limpiarTransformacion();
   }
 
   showModal(): void {
@@ -105,12 +125,14 @@ export class ConsumidoresComponent implements OnInit {
   }
 
   guardar(): void {
+    const observacion = (this.validateForm.value.observacion === '' || this.validateForm.value.observacion === null) ? 'N/A' : this.validateForm.value.observacion;
+
     this.dataEntrada = {
       codigo: this.validateForm.value.codigo,
       descripcion: this.validateForm.value.descripcion,
       tipo: (this.validateForm.value.tipo === 'true') ? true:false,
       entidad: 0,
-      observacion: this.validateForm.value.observacion,
+      observacion: observacion,
       estado: true
     }
 
@@ -195,5 +217,94 @@ export class ConsumidoresComponent implements OnInit {
       observacion:['']
     });
   }
+
+  //ASIGNACION MEDIDORES
+  open(data): void {
+    this.visibleDrawer = true;
+    this.idMedidor=data.id;
+
+    this.entidadService.getMedidorEntidad(this.idMedidor).toPromise().then(
+      (data:MedidorEntidadModel[])=>{
+        this.listofMedidor=data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    )
+
+    this.jerarquiaService.getJerarquia().toPromise().then(
+      (data:JerarquiaModel[])=>{
+        this.listofJerarquia=data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    )
+
+    this.medidorService.getAllVariablesPME().toPromise().then(
+      (data:variableModel[])=>{
+        this.listofVariableMedidor=data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    )
+
+
+  }
+
+  close(): void {
+    this.visibleDrawer= false;
+  }
+
+  editarMedidor(data){}
+
+  eliminarMedidor(data){}
+
+  handleCancelMedidor():void{
+    this.visibleDrawer = false;
+    this.accionMedidor = 'new';
+    this.limpiarMedidor();
+  }
+
+  limpiarMedidor():void{
+    this.validateFormMedidores = this.fb.group({
+      variableMedidorId: [null, [Validators.required]],
+      jerarquiaId: [null, [Validators.required]],
+      fecha:[null],
+      observacion:['']
+    });
+  }
+
+  handleOkMedidor(): void {
+    this.visibleDrawer = false;
+  }
+
+  //TRANSFORMACIONES
+  handleCancelTransformacion():void{
+    this.isVisibleTransformacion = false;
+    this.accionTransformacion = 'new';
+    this.limpiarTransformacion();
+  }
+
+  handleOkTransformacion(): void {
+    this.isVisibleTransformacion = false;
+  }
+
+  limpiarTransformacion():void{
+
+  }
+
+  showModalTransformacion(): void {
+    this.isVisibleTransformacion = true;
+  }
+
+  editarTransformacion(data){}
+
+
+  eliminarTransformacion(data){}
 
 }

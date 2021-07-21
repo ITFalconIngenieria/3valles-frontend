@@ -35,6 +35,7 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 //import { NzI18nService } from 'ng-zorro-antd/i18n';
 //import { enUS, ja } from 'date-fns/locale';
 
@@ -78,7 +79,8 @@ registerLocaleData(en);
     NzMessageModule,
     NzRadioModule,
     NzInputNumberModule,
-    NzDatePickerModule 
+    NzDatePickerModule,
+    NzDrawerModule
   ],
   providers: [
     { provide: NZ_I18N, 

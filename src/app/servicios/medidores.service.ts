@@ -71,6 +71,10 @@ export class MedidorService {
         return this.http.get(`${apiUrl}v-variables-medidors?filter[where][medidorId]=${id}`);
     }
 
+    getAllVariablesPME() {
+        return this.http.get(`${apiUrl}v-variables-medidors`);
+    }
+
     getVariable(){
         return this.http.get(`${apiUrl}variables`);
     }

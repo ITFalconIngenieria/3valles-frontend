@@ -30,7 +30,25 @@ export class EntidadService {
     // medidoresEntidad
 
     getMedidorEntidad(id) {
-        return this.http.get(`${apiUrl}medidor-entidads?filter[where][and][0][estado]=true&filter[where][and][1][id]=${id}`)
+        return this.http.get(`${apiUrl}medidor-entidads?filter=
+        {
+            "where":{
+            "and":[
+            {"estado":true},{"entidadId":${id}}
+            ]
+            },
+              "include": [
+                {
+                  "relation": "variableMedidor",
+                  "scope":{
+                  "include":[{"relation":"variable"},{"relation":"medidor"}]
+            }
+                },
+                {
+                  "relation": "jerarquia"
+                }
+              ]
+        }`)
     }
 
     postMedidorEntidad(medidorEntidad) {
