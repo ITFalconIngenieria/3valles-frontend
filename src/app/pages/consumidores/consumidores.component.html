@@ -189,7 +189,7 @@
                             <nz-select formControlName="variableMedidorId" nzPlaceHolder="Selecciona aquí..."
                                 nzShowSearch nzAllowClear>
                                 <nz-option *ngFor="let item of listofVariableMedidor"
-                                    [nzValue]="item.variableMedidoId" [nzLabel]="item.medidor + ' - ' + item.name">
+                                    [nzValue]="item.variableMedidorId" [nzLabel]="item.medidor + ' - ' + item.name">
                                 </nz-option>
                             </nz-select>
                         </nz-form-control>
@@ -211,9 +211,9 @@
                 <div nz-col nzSpan="1"></div>
                 <div nz-col nzSpan="8">
                     <nz-form-item>
-                        <nz-form-label formControlName="fecha">Rango de Fechas</nz-form-label>
+                        <nz-form-label>Rango de Fechas</nz-form-label>
                         <nz-form-control>
-                            <nz-range-picker style="width: 100%;"></nz-range-picker>
+                            <nz-range-picker nzFormat="yyyy-MM-dd" style="width: 100%;" formControlName="fecha"></nz-range-picker>
                         </nz-form-control>
                     </nz-form-item>
                 </div>

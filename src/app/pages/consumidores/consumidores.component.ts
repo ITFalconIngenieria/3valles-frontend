@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
-import { EntidadModel, ColumnItem  } from 'src/app/modelos/entidad';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EntidadModel, ColumnItem } from 'src/app/modelos/entidad';
 import { EntidadService } from 'src/app/servicios/entidad.service';
 import { MedidorService } from 'src/app/servicios/medidores.service';
 import { JerarquiaService } from 'src/app/servicios/jerarquia.service';
@@ -8,6 +8,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { MedidorEntidadModel } from '../../modelos/entidad';
 import { JerarquiaModel } from '../../modelos/jerarquia';
 import { variableModel } from '../../modelos/medidor';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-consumidores',
@@ -15,10 +16,11 @@ import { variableModel } from '../../modelos/medidor';
   styleUrls: ['./consumidores.component.css']
 })
 export class ConsumidoresComponent implements OnInit {
+  pipe = new DatePipe('en-US');
   expandSet = new Set<any>();
   isVisible = false;
   isVisibleTransformacion = false;
-  visibleDrawer=false;
+  visibleDrawer = false;
 
   validateForm: FormGroup;
   validateFormMedidores: FormGroup;
@@ -26,18 +28,20 @@ export class ConsumidoresComponent implements OnInit {
   visible = false;
 
   accion: string;
-  accionMedidor:string;
-  accionTransformacion:string;
-  idMedidor:number;
+  accionMedidor: string;
+  accionTransformacion: string;
+  idMedidor: number;
 
   entradaEdit;
+  medidorEdit;
   dataEntrada;
+  dataMedidor;
 
   listofEntidad: EntidadModel[] = [];
   listOfDisplayData: EntidadModel[] = [];
   listofMedidor: MedidorEntidadModel[] = [];
-  listofJerarquia: JerarquiaModel[]=[];
-  listofVariableMedidor: variableModel[]=[];
+  listofJerarquia: JerarquiaModel[] = [];
+  listofVariableMedidor: variableModel[] = [];
 
   listOfColumns: ColumnItem[] = [
     {
@@ -63,8 +67,8 @@ export class ConsumidoresComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private entidadService: EntidadService,
-    private jerarquiaService:JerarquiaService,
-    private medidorService:MedidorService,
+    private jerarquiaService: JerarquiaService,
+    private medidorService: MedidorService,
     private nzMessageService: NzMessageService
   ) { }
 
@@ -130,7 +134,7 @@ export class ConsumidoresComponent implements OnInit {
     this.dataEntrada = {
       codigo: this.validateForm.value.codigo,
       descripcion: this.validateForm.value.descripcion,
-      tipo: (this.validateForm.value.tipo === 'true') ? true:false,
+      tipo: (this.validateForm.value.tipo === 'true') ? true : false,
       entidad: 0,
       observacion: observacion,
       estado: true
@@ -213,19 +217,19 @@ export class ConsumidoresComponent implements OnInit {
     this.validateForm = this.fb.group({
       codigo: ['', [Validators.required]],
       descripcion: [''],
-      tipo:['false'],
-      observacion:['']
+      tipo: ['false'],
+      observacion: ['']
     });
   }
 
   //ASIGNACION MEDIDORES
   open(data): void {
     this.visibleDrawer = true;
-    this.idMedidor=data.id;
+    this.idMedidor = data.id;
 
     this.entidadService.getMedidorEntidad(this.idMedidor).toPromise().then(
-      (data:MedidorEntidadModel[])=>{
-        this.listofMedidor=data;
+      (data: MedidorEntidadModel[]) => {
+        this.listofMedidor = data;
       },
       (error) => {
         this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
@@ -234,8 +238,8 @@ export class ConsumidoresComponent implements OnInit {
     )
 
     this.jerarquiaService.getJerarquia().toPromise().then(
-      (data:JerarquiaModel[])=>{
-        this.listofJerarquia=data;
+      (data: JerarquiaModel[]) => {
+        this.listofJerarquia = data;
       },
       (error) => {
         this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
@@ -244,8 +248,8 @@ export class ConsumidoresComponent implements OnInit {
     )
 
     this.medidorService.getAllVariablesPME().toPromise().then(
-      (data:variableModel[])=>{
-        this.listofVariableMedidor=data;
+      (data: variableModel[]) => {
+        this.listofVariableMedidor = data;
       },
       (error) => {
         this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
@@ -257,25 +261,47 @@ export class ConsumidoresComponent implements OnInit {
   }
 
   close(): void {
-    this.visibleDrawer= false;
+    this.visibleDrawer = false;
   }
 
-  editarMedidor(data){}
+  editarMedidor(data) {
+    this.accion = 'editar';
+    const F1 = this.pipe.transform(data.fechaInicial, 'yyyy-MM-dd HH:mm', '+0000');
+    const F2 = this.pipe.transform(data.fechaFinal, 'yyyy-MM-dd HH:mm', '+0000');
 
-  eliminarMedidor(data){}
+    this.validateFormMedidores = this.fb.group({
+      variableMedidorId: [data.variableMedidorId, [Validators.required]],
+      jerarquiaId: [data.jerarquiaId, [Validators.required]],
+      fecha: [[F1, F2]],
+      observacion: [data.observacion],
+    })
 
-  handleCancelMedidor():void{
+  }
+
+  eliminarMedidor(data) { 
+    this.entidadService.deleteMedidorEntidad(data.id, { estado: false }).toPromise().then(
+      ()=>{
+        this.nzMessageService.success('El registro fue eliminado con éxito');
+        this.listofMedidor = this.listofMedidor.filter(x => x.id !== data.id);
+      }, (error) => {
+        this.nzMessageService.warning('El registro no pudo ser eleminado, por favor intente de nuevo o contactese con su administrador');
+        console.log(error);
+      }
+    )
+  }
+
+  handleCancelMedidor(): void {
     this.visibleDrawer = false;
     this.accionMedidor = 'new';
     this.limpiarMedidor();
   }
 
-  limpiarMedidor():void{
+  limpiarMedidor(): void {
     this.validateFormMedidores = this.fb.group({
       variableMedidorId: [null, [Validators.required]],
       jerarquiaId: [null, [Validators.required]],
-      fecha:[null],
-      observacion:['']
+      fecha: [null],
+      observacion: ['']
     });
   }
 
@@ -283,8 +309,56 @@ export class ConsumidoresComponent implements OnInit {
     this.visibleDrawer = false;
   }
 
+  guardarMedidor():void{
+    const observacion = (this.validateFormMedidores.value.observacion === '' || this.validateFormMedidores.value.observacion === null) ? 'N/A' : this.validateFormMedidores.value.observacion;
+    const F1 = this.pipe.transform(this.validateFormMedidores.value.fecha[0], 'yyyy-MM-dd HH:mm', '-0600');
+    const F2 = this.pipe.transform(this.validateFormMedidores.value.fecha[1], 'yyyy-MM-dd HH:mm', '-0600');
+
+
+    this.dataMedidor = {
+      variableMedidorId: this.validateFormMedidores.value.variableMedidorId,
+      entidadId: this.validateFormMedidores.value.entidadId,
+      fechaInicial: F1,
+      fechaFinal: F2,
+      jerarquiaId: this.validateFormMedidores.value.jerarquiaId,
+      observacion,
+      estado: true
+    }
+
+    console.log(this.listofMedidor)
+/*
+    if (this.accion === 'editar') {
+      this.entidadService.putMedidorEntidad(this.medidorEdit,this.dataMedidor).toPromise().then(
+        (data)=>{
+         
+          this.accion = 'new';
+          this.limpiarMedidor();
+          this.isVisible = false;
+          this.nzMessageService.success('El registro fue guardado con éxito');
+        },
+          (error) => {
+            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+            console.log(error);
+            this.limpiarMedidor();
+            this.accion = 'new';
+            this.isVisible = false;
+          }
+      )
+    }else{
+
+    }*/
+    console.log(this.dataMedidor)
+  }
+
+  submitFormMedidores(){
+    for (const i in this.validateFormMedidores.controls) {
+      this.validateFormMedidores.controls[i].markAsDirty();
+      this.validateFormMedidores.controls[i].updateValueAndValidity();
+    }
+  }
+
   //TRANSFORMACIONES
-  handleCancelTransformacion():void{
+  handleCancelTransformacion(): void {
     this.isVisibleTransformacion = false;
     this.accionTransformacion = 'new';
     this.limpiarTransformacion();
@@ -294,7 +368,7 @@ export class ConsumidoresComponent implements OnInit {
     this.isVisibleTransformacion = false;
   }
 
-  limpiarTransformacion():void{
+  limpiarTransformacion(): void {
 
   }
 
@@ -302,9 +376,9 @@ export class ConsumidoresComponent implements OnInit {
     this.isVisibleTransformacion = true;
   }
 
-  editarTransformacion(data){}
+  editarTransformacion(data) { }
 
 
-  eliminarTransformacion(data){}
+  eliminarTransformacion(data) { }
 
 }

@@ -12,7 +12,7 @@ export class JerarquiaService {
     constructor(private http: HttpClient) { }
 
     getJerarquia() {
-        return this.http.get(`${apiUrl}jerarquias?filter[where][estado]=true`)
+        return this.http.get(`${apiUrl}jerarquias`)
     }
 
     postJerarquia(jerarquia) {
