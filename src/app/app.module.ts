@@ -1,4 +1,4 @@
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -8,11 +8,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IconsProviderModule } from './icons-provider.module';
-//component
+// component
 import { MenuComponent } from './pages/menu/menu.component';
 import { LoginComponent } from './pages/login/login.component';
-//ng-zorro
-import { en_US,NZ_I18N } from 'ng-zorro-antd/i18n';
+import { FacturaComponent } from './pages/factura/factura.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+
+import { ChartsModule } from 'ng2-charts';
+import { NgxSpinnerModule } from "ngx-spinner";
+
+// ng-zorro
+import { en_US, NZ_I18N } from 'ng-zorro-antd/i18n';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -36,8 +42,8 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
-//import { NzI18nService } from 'ng-zorro-antd/i18n';
-//import { enUS, ja } from 'date-fns/locale';
+// import { NzI18nService } from 'ng-zorro-antd/i18n';
+// import { enUS, ja } from 'date-fns/locale';
 
 
 registerLocaleData(en);
@@ -51,7 +57,9 @@ registerLocaleData(en);
     JerarquiaComponent,
     EntradaComponent,
     TransformadoresComponent,
-    ConsumidoresComponent
+    ConsumidoresComponent,
+    FacturaComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -61,7 +69,9 @@ registerLocaleData(en);
     HttpClientModule,
     BrowserAnimationsModule,
     IconsProviderModule,
-    //ng-zorro
+    ChartsModule,
+    NgxSpinnerModule,
+    // ng-zorro
     NzMenuModule,
     NzLayoutModule,
     NzMenuModule,
@@ -71,7 +81,7 @@ registerLocaleData(en);
     NzIconModule,
     NzCheckboxModule,
     NzGridModule,
-    NzTableModule ,
+    NzTableModule,
     NzDropDownModule,
     NzModalModule,
     NzSelectModule,
@@ -82,22 +92,24 @@ registerLocaleData(en);
     NzDatePickerModule,
     NzDrawerModule
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
-    { provide: NZ_I18N, 
+    {
+      provide: NZ_I18N,
       useFactory: (localId: string) => {
         switch (localId) {
           case 'en':
             return en_US;
           default:
-              return en_US;
-          }
+            return en_US;
+        }
       },
       deps: [LOCALE_ID]
     }
- //   { provide: NZ_I18N, useValue: enUS }
+    //   { provide: NZ_I18N, useValue: enUS }
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
- // constructor(private i18n: NzI18nService) { }
- }
+  // constructor(private i18n: NzI18nService) { }
+}

@@ -1,6 +1,5 @@
 <nz-layout class="app-layout">
-    <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" nzBreakpoint="md" [(nzCollapsed)]="isCollapsed"
-        [nzTrigger]="null">
+    <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" nzBreakpoint="md" [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
         <div class="sidebar-logo">
             <img src="assets/logo-simbolo.svg" alt="logo">
             <h1>TRES VALLES</h1>
@@ -44,8 +43,16 @@
                 </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
-                <i nz-icon nzType="solution"></i>
-                <span>Facturacion</span>
+                <a [routerLink]="['/factura']">
+                    <i nz-icon nzType="solution"></i>
+                    <span>Facturacion</span>
+                </a>
+            </li>
+            <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
+                <a [routerLink]="['/dashboard']">
+                    <i nz-icon nzType="pie-chart"></i>
+                    <span>Dashboard</span>
+                </a>
             </li>
             <li nz-menu-item nz-tooltip nzTooltipPlacement="right">
                 <i nz-icon nzType="bar-chart"></i>
