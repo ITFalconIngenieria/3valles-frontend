@@ -152,7 +152,8 @@
                         <tr>
                             <td [nzExpand]="expandSet.has(data.id)" nzShowExpand="true"
                                 (nzExpandChange)="onExpandChange(data.id, $event)"></td>
-                            <td>{{ data.variableMedidorId + ' - ' + data.variableMedidor.medidor.descripcion + ' ' +data.variableMedidor.variable.descripcion }}</td>
+                            <td>{{ data.variableMedidorId + ' - ' + data.variableMedidor.medidor.descripcion + ' '
+                                +data.variableMedidor.variable.descripcion }}</td>
                             <td>{{ data.fechaInicial | date:'yyyy-MM-dd':'+0600'}}</td>
                             <td>{{ data.fechaFinal | date:'yyyy-MM-dd':'+0600'}}</td>
                             <td>{{ data.jerarquia.descripcion }}</td>
@@ -188,8 +189,8 @@
                         <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
                             <nz-select formControlName="variableMedidorId" nzPlaceHolder="Selecciona aquí..."
                                 nzShowSearch nzAllowClear>
-                                <nz-option *ngFor="let item of listofVariableMedidor"
-                                    [nzValue]="item.variableMedidorId" [nzLabel]="item.medidor + ' - ' + item.name">
+                                <nz-option *ngFor="let item of listofVariableMedidor" [nzValue]="item.variableMedidorId"
+                                    [nzLabel]="item.medidor + ' - ' + item.name">
                                 </nz-option>
                             </nz-select>
                         </nz-form-control>
@@ -200,9 +201,10 @@
                     <nz-form-item>
                         <nz-form-label>Jerarquia</nz-form-label>
                         <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
-                            <nz-select formControlName="jerarquiaId" nzPlaceHolder="Selecciona aquí..." nzShowSearch nzAllowClear>
-                                <nz-option *ngFor="let item of listofJerarquia"
-                                    [nzValue]="item.id" [nzLabel]="item.descripcion">
+                            <nz-select formControlName="jerarquiaId" nzPlaceHolder="Selecciona aquí..." nzShowSearch
+                                nzAllowClear>
+                                <nz-option *ngFor="let item of listofJerarquia" [nzValue]="item.id"
+                                    [nzLabel]="item.descripcion">
                                 </nz-option>
                             </nz-select>
                         </nz-form-control>
@@ -213,7 +215,8 @@
                     <nz-form-item>
                         <nz-form-label>Rango de Fechas</nz-form-label>
                         <nz-form-control>
-                            <nz-range-picker nzFormat="yyyy-MM-dd" style="width: 100%;" formControlName="fecha"></nz-range-picker>
+                            <nz-range-picker nzFormat="yyyy-MM-dd HH:mm" style="width: 100%;" formControlName="fecha">
+                            </nz-range-picker>
                         </nz-form-control>
                     </nz-form-item>
                 </div>
@@ -226,26 +229,45 @@
             </nz-form-item>
             <nz-form-item>
                 <nz-form-control>
-                    <div nz-row>
-                        <div nz-col nzSpan="11">
+                    <div nz-row *ngIf="accion==='editar'; else crearMedidor">
+                        <div nz-col nzSpan="7">
                             <button nz-button style="width: 100%;" nzType="default"
                                 (click)="handleCancelMedidor()">Cancelar</button>
                         </div>
-                        <div nz-col nzSpan="2"></div>
-                        <div nz-col nzSpan="11">
+                        <div nz-col nzSpan="1"></div>
+                        <div nz-col nzSpan="7">
                             <button nz-button style="width: 100%;" nzType="primary" (click)="guardarMedidor()"
                                 [disabled]="permiso">Guardar</button>
                         </div>
+                        <div nz-col nzSpan="1"></div>
+                        <div nz-col nzSpan="8">
+                            <button nz-button style="width: 100%;" nzType="primary" (click)="showModalTransformacion()">Registrar
+                                Perdidas de Transformacion</button>
+                        </div>
                     </div>
+
                 </nz-form-control>
             </nz-form-item>
         </form>
-        <button nz-button nzType="primary" (click)="showModalTransformacion()">Open</button>
     </ng-container>
 
     <ng-template #footerTpl>
         <div style="float: right">
             <button nz-button nzType="primary" (click)="close()">OK</button>
+        </div>
+    </ng-template>
+
+    <ng-template #crearMedidor>
+        <div nz-row>
+            <div nz-col nzSpan="11">
+                <button nz-button style="width: 100%;" nzType="default"
+                    (click)="handleCancelMedidor()">Cancelar</button>
+            </div>
+            <div nz-col nzSpan="2"></div>
+            <div nz-col nzSpan="11">
+                <button nz-button style="width: 100%;" nzType="primary" (click)="guardarMedidor()"
+                    [disabled]="permiso">Guardar</button>
+            </div>
         </div>
     </ng-template>
 </nz-drawer>

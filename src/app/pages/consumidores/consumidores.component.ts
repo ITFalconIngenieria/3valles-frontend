@@ -268,6 +268,7 @@ export class ConsumidoresComponent implements OnInit {
     this.accion = 'editar';
     const F1 = this.pipe.transform(data.fechaInicial, 'yyyy-MM-dd HH:mm', '+0000');
     const F2 = this.pipe.transform(data.fechaFinal, 'yyyy-MM-dd HH:mm', '+0000');
+    this.medidorEdit=data.id
 
     this.validateFormMedidores = this.fb.group({
       variableMedidorId: [data.variableMedidorId, [Validators.required]],
@@ -311,30 +312,29 @@ export class ConsumidoresComponent implements OnInit {
 
   guardarMedidor():void{
     const observacion = (this.validateFormMedidores.value.observacion === '' || this.validateFormMedidores.value.observacion === null) ? 'N/A' : this.validateFormMedidores.value.observacion;
-    const F1 = this.pipe.transform(this.validateFormMedidores.value.fecha[0], 'yyyy-MM-dd HH:mm', '-0600');
-    const F2 = this.pipe.transform(this.validateFormMedidores.value.fecha[1], 'yyyy-MM-dd HH:mm', '-0600');
-
+    const F1 = this.pipe.transform(this.validateFormMedidores.value.fecha[0], 'yyyy-MM-dd HH:mm', '-1200');
+    const F2 = this.pipe.transform(this.validateFormMedidores.value.fecha[1], 'yyyy-MM-dd HH:mm', '-1200');
 
     this.dataMedidor = {
       variableMedidorId: this.validateFormMedidores.value.variableMedidorId,
-      entidadId: this.validateFormMedidores.value.entidadId,
-      fechaInicial: F1,
-      fechaFinal: F2,
+      entidadId: this.idMedidor,
+      fechaInicial: new Date(F1).toISOString(),
+      fechaFinal: new Date(F2).toISOString(),
       jerarquiaId: this.validateFormMedidores.value.jerarquiaId,
       observacion,
       estado: true
     }
 
-    console.log(this.listofMedidor)
-/*
     if (this.accion === 'editar') {
       this.entidadService.putMedidorEntidad(this.medidorEdit,this.dataMedidor).toPromise().then(
-        (data)=>{
+        (data:MedidorEntidadModel)=>{
+         this.listofMedidor[this.listofMedidor.map(x=>x.id).indexOf(this.medidorEdit)] = data
          
           this.accion = 'new';
           this.limpiarMedidor();
           this.isVisible = false;
           this.nzMessageService.success('El registro fue guardado con éxito');
+          this.handleOkMedidor()
         },
           (error) => {
             this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
@@ -343,11 +343,24 @@ export class ConsumidoresComponent implements OnInit {
             this.accion = 'new';
             this.isVisible = false;
           }
+          
       )
     }else{
-
-    }*/
-    console.log(this.dataMedidor)
+      this.entidadService.postMedidorEntidad(this.dataMedidor)
+      .toPromise()
+      .then(
+        (data:MedidorEntidadModel) => {
+          this.listofMedidor = [...this.listofMedidor, data];
+          this.nzMessageService.success('El registro fue guardado con éxito');
+          this.limpiarMedidor();
+        },
+        (error) => {
+          this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+          this.limpiarMedidor();
+        }
+      )
+    }
   }
 
   submitFormMedidores(){
