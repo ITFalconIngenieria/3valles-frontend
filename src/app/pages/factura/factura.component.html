@@ -1,0 +1,148 @@
+<div class="container-opciones">
+    <nz-input-group nzAddOnBefore="Cliente" nzSize="small">
+        <nz-select [(ngModel)]="cliente" nzSize="small" (ngModelChange)="changeEntidad($event)" nzPlaceHolder="Seleccione...">
+            <nz-option *ngFor="let entidad of listOfEntidad" [nzLabel]="entidad.codigo" [nzValue]="entidad.id">
+            </nz-option>
+        </nz-select>
+    </nz-input-group>
+    <nz-input-group nzAddOnBefore="Medidor" nzSize="small">
+        <nz-select [(ngModel)]="medidor" nzSize="small" nzPlaceHolder="Seleccione...">
+            <nz-option *ngFor="let medidor of listOfMedidorFiltrado" [nzLabel]="medidor.name + '-' + medidor.medidor " [nzValue]="medidor.id"></nz-option>
+        </nz-select>
+    </nz-input-group>
+    <nz-input-group nzAddOnBefore="Rango tiempo" nzSize="small">
+        <nz-select nzSize="small" [(ngModel)]="tiempo">
+            <nz-option nzLabel="Hoy" nzValue="1"></nz-option>
+            <nz-option nzLabel="Ayer" nzValue="2"></nz-option>
+            <nz-option nzLabel="Desde ayer" nzValue="3"></nz-option>
+            <nz-option nzLabel="Semana hasta la fecha" nzValue="4"></nz-option>
+            <nz-option nzLabel="Año hasta la fecha" nzValue="5"></nz-option>
+            <nz-option nzLabel="Ultima semana" nzValue="6"></nz-option>
+            <nz-option nzLabel="Ultimas 2 semanas" nzValue="7"></nz-option>
+            <nz-option nzLabel="Este mes" nzValue="8"></nz-option>
+            <nz-option nzLabel="Ultimo mes" nzValue="9"></nz-option>
+            <nz-option nzLabel="Ultimo año" nzValue="10"></nz-option>
+        </nz-select>
+    </nz-input-group>
+    <div class="botones">
+        <button nz-button nzType="primary" nzSize="small" (click)="mostrar()" style=" background-color: #027519; border-color: #027519; ">
+            <i nz-icon nzType="search"></i>
+            Mostrar
+        </button>
+        <button nz-button nzType="primary" nzSize="small" (click)="imprimir()" style=" background-color: #c41a1a; border-color: #c41a1a; ">
+            <i nz-icon nzType="printer"></i>
+            Imprimir
+        </button>
+    </div>
+</div>
+<br>
+<div id="content" style="width: 90%; margin: auto;" *ngIf="visible">
+    <div class="encabezado">
+        <img style="width: 7%;" src="assets/logo.svg" alt="">
+        <p class="title">Factura</p>
+    </div>
+    <br>
+    <div class="titulo-separador">
+        <p style="font-size: 20px; font-weight: bold;">Datos de factura</p>
+        <p style="font-size: 20px; font-weight: bold;">Datos del titular</p>
+    </div>
+    <div class="container-datos">
+        <div class="container-info">
+            <div>
+                <p class="nombre-dato"> NOMBRE: </p>
+                <p class="nombre-dato"> NÚMERO DE COMPAÑIA: </p>
+                <p class="nombre-dato"> NÚMERO DE FACTURA: </p>
+
+            </div>
+            <div>
+                <p> Tres Valle </p>
+                <p> 54 </p>
+                <p> 00000 </p>
+            </div>
+        </div>
+        <div class="container-info">
+            <div>
+                <p class="nombre-dato"> FECHA EMISIÓN: </p>
+                <p class="nombre-dato"> PERIODO: </p>
+                <p class="nombre-dato"> DÍAS DE FACTURACÓN: </p>
+            </div>
+            <div>
+                <p> {{ fechaDia | date: 'yyyy-MM-dd HH:mm a'}} </p>
+                <p> {{ fecha1 | date: 'yyyy-MM-dd HH:mm a'}} al {{ fecha2 | date: 'yyyy-MM-dd HH:mm a'}}</p>
+                <p> 30 </p>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="titulo-separador">
+        <p style="font-size: 20px; font-weight: bold;">Detalle de consumo de energia</p>
+    </div>
+    <div class="container-lecturas">
+        <div class="div-valores">
+            <p class="titulo-lecturas">Lectura inicial</p>
+            <p class="valor"> {{ dataFactura.lecturaInicial | number:'1.2-2':'en_US'}} </p>
+        </div>
+        <div class="div-valores">
+            <p class="titulo-lecturas">Lectura final</p>
+            <p class="valor"> {{ dataFactura.lecturaFinal | number:'1.2-2':'en_US'}} </p>
+        </div>
+        <div class="div-valores">
+            <p class="titulo-lecturas">Consumo</p>
+            <p class="valor"> {{ dataFactura.consumo | number:'1.2-2':'en_US'}} </p>
+        </div>
+        <div class="div-valores">
+            <p class="titulo-lecturas">Perdidas</p>
+            <p class="valor"> {{ dataFactura.perdidas | number:'1.2-2':'en_US'}} </p>
+        </div>
+        <div class="div-valores">
+            <p class="titulo-lecturas">Total kWh</p>
+            <p class="valor"> {{ dataFactura.total | number:'1.2-2':'en_US'}} </p>
+        </div>
+    </div>
+    <br>
+    <div class="titulo-separador">
+        <p style="font-size: 15px; font-weight: bold;">Detalle pérdidas</p>
+        <p style="font-size: 15px; font-weight: bold;">Consumo energía electrica</p>
+    </div>
+    <div class="container-detalle">
+        <div style="width: 100%; margin: auto;">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr style="text-align: center;">
+                        <th>Generador</th>
+                        <th>Pérdida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let generador of detallePerdidas; let i = index">
+                        <td> Generador {{ i+1 }}</td>
+                        <td style="text-align: right;"> {{ generador | number:'1.2-2':'en_US'}} </td>
+                    </tr>
+
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: #578f61b0; text-align: right; font-weight: bold;">
+                        <td style="text-align: right; ">Total </td>
+                        <td style="text-align: right; "> 0.00 </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div>
+            <div style="height: 80%; width: 80%; margin: auto;">
+                <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType">
+                </canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="!visible" style="display: flex; flex-direction: column; align-items: center;">
+    <img style="width: 25%;" src="assets/logo.svg" alt="">
+    <p style="font-family: 'Roboto', sans-serif;font-size: 40px; color: #8a8a8a;">Factura</p>
+</div>
+
+<ngx-spinner bdColor="rgba(187,218,255,0.8)" size="medium" color="#0061aa" type="triangle-skew-spin" [fullScreen]="true">
+    <p style="color: white"> Preparando... </p>
+</ngx-spinner>

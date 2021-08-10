@@ -1,0 +1,71 @@
+<div class="container-graficos">
+    <nz-input-group nzAddOnBefore="Rango tiempo" nzSize="small">
+        <nz-select nzSize="small" [(ngModel)]="tiempo">
+            <nz-option nzLabel="Hoy" nzValue="1"></nz-option>
+            <nz-option nzLabel="Ayer" nzValue="2"></nz-option>
+            <nz-option nzLabel="Desde ayer" nzValue="3"></nz-option>
+            <nz-option nzLabel="Semana hasta la fecha" nzValue="4"></nz-option>
+            <nz-option nzLabel="Año hasta la fecha" nzValue="5"></nz-option>
+            <nz-option nzLabel="Ultima semana" nzValue="6"></nz-option>
+            <nz-option nzLabel="Ultimas 2 semanas" nzValue="7"></nz-option>
+            <nz-option nzLabel="Este mes" nzValue="8"></nz-option>
+            <nz-option nzLabel="Ultimo mes" nzValue="9"></nz-option>
+            <nz-option nzLabel="Ultimo año" nzValue="10"></nz-option>
+        </nz-select>
+    </nz-input-group>
+    <div class="botones">
+        <button nz-button nzType="primary" nzSize="small" (click)="mostrar()" style=" background-color: #027519; border-color: #027519; ">
+      <i nz-icon nzType="search"></i>
+      Mostrar
+  </button>
+        <button nz-button nzType="primary" nzSize="small" (click)="imprimir()" style=" background-color: #c41a1a; border-color: #c41a1a; ">
+      <i nz-icon nzType="printer"></i>
+      Imprimir
+  </button>
+    </div>
+
+</div>
+<br>
+<div id="content" *ngIf="visible">
+    <br>
+    <p style="font-family: 'Baloo Paaji 2', cursive; font-size: 40px; color: #8a8a8a;">Dasboard</p>
+    <div class="container-valores">
+        <div class="div-border">
+            <p class="titulos-valores">Venta a ENEE</p>
+            <p class="valor"> 1,234,654.00 kWh</p>
+        </div>
+        <div class="div-border">
+            <p class="titulos-valores">Generación kWh</p>
+            <p class="valor"> 1,234,654.00 kWh</p>
+        </div>
+        <div class="div-border">
+            <p class="titulos-valores">Pérdidad kWh</p>
+            <p class="valor"> 1,234,654.00 kWh</p>
+        </div>
+        <div>
+            <p class="titulos-valores">Consumo</p>
+            <p class="valor"> 1,234,654.00 kWh</p>
+        </div>
+    </div>
+    <hr style="background-color: #eaeaea; height: 5px; border: none;">
+    <div class="container-graficos">
+        <div class="div-border" style="width: 90%; margin: auto;">
+            <h2 class="titulos-grafico">Generaciones</h2>
+            <canvas baseChart [datasets]="ChartGenetData" [labels]="ChartGenetLabels" [options]="ChartGenetOptions" [legend]="ChartGenetLegend" [chartType]="ChartGenetType">
+                </canvas>
+        </div>
+        <div style="width: 90%; margin: auto;">
+            <h2 class="titulos-grafico">Consumo</h2>
+            <canvas baseChart [datasets]="ChartConsuData" [labels]="ChartConsuLabels" [chartType]="ChartConsuType"></canvas>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!visible" style="display: flex; flex-direction: column; align-items: center;">
+    <img style="width: 25%;" src="assets/logo.svg" alt="">
+    <p style="font-family: 'Roboto', sans-serif; font-size: 40px; color: #8a8a8a;">Dasboard</p>
+</div>
+
+<ngx-spinner bdColor="rgba(187,218,255,0.8)" size="medium" color="#0061aa" type="triangle-skew-spin" [fullScreen]="true">
+    <p style="color: white"> Preparando... </p>
+</ngx-spinner>
