@@ -3,6 +3,9 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { NgxSpinnerService } from 'ngx-spinner';
 import * as moment from 'moment';
+import { EntidadService } from 'src/app/servicios/entidad.service';
+import { MedidorService } from 'src/app/servicios/medidores.service';
+import { FacturaService } from './../../servicios/factura.service';
 
 @Component({
   selector: 'app-factura',
@@ -16,6 +19,9 @@ export class FacturaComponent implements OnInit {
   cliente: any;
   medidor: any;
   tiempo: any;
+  listOfEntidad: any[] = [];
+  listOfMedidor: any[] = [];
+  listOfMedidorFiltrado: any[] = [];
   fechaDia: any = new Date();
   fecha1: any = new Date();
   fecha2: any = new Date();
@@ -24,99 +30,93 @@ export class FacturaComponent implements OnInit {
   barChartType: any;
   barChartLegend: any;
   barChartData: any[] = [];
+  dataFactura: any;
+  detallePerdidas: any[] = [];
+  consumoHistorico: any[] = [];
 
   constructor(
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private serviceEntidad: EntidadService,
+    private serviceMedidor: MedidorService,
+    private serviceFactura: FacturaService
   ) {
 
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
 
+    this.dataFactura = '';
+    this.serviceEntidad.getEntidadFilter()
+      .toPromise()
+      .then((data: any) => {
+        this.listOfEntidad = data;
+        this.serviceMedidor.getMedidorEntidad()
+          .toPromise()
+          .then((datos: any) => this.listOfMedidor = datos);
+      });
 
     this.barChartOptions = {
       scaleShowVerticalLines: false,
       responsive: true
     };
 
-    this.barChartLabels = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
     this.barChartType = 'bar';
     this.barChartLegend = true;
-    this.barChartData = [
-      {
-        data: [65, 59, 80, 81, 56, 55, 60], label: 'kW',
-        backgroundColor: '#043f79',
-      }
-    ];
 
   }
 
   mostrar() {
     this.visible = true;
-
+    let data: any[] = [];
     switch (this.tiempo) {
       case '1': {
-        console.log(moment().startOf('day').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().startOf('day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
 
         break;
       }
       case '2': {
-        console.log(moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm'), moment().add(-1, 'day').endOf('day').format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().add(-1, 'day').endOf('day').format('YYYY-MM-DD HH:mm');
 
         break;
       }
       case '3': {
-        console.log(moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm')
         break;
       }
       case '4': {
-        console.log(moment(moment().startOf('week')).add(1, 'day').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
         break;
       }
       case '5': {
-        console.log(moment().startOf('year').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().startOf('year').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
         break;
       }
       case '6': {
-        console.log(moment(moment().startOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm')
         this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm')
         break;
       }
       case '7': {
-        console.log(moment(moment().startOf('week').subtract(2, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('week').subtract(2, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
         break;
       }
       case '8': {
-        console.log(moment().startOf('month').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().startOf('month').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
         break;
       }
       case '9': {
-        console.log(moment(moment().startOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment(moment().endOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm');
         break;
       }
       case '10': {
-        console.log(moment(moment().startOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment(moment().endOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm');
         break;
@@ -125,6 +125,42 @@ export class FacturaComponent implements OnInit {
         break;
     }
 
+    this.serviceFactura.getDetalle()
+      .toPromise()
+      .then((datos: any) => {
+        this.dataFactura = datos[0];
+
+        [...this.dataFactura.detallePerdidas].forEach(element => {
+          // tslint:disable-next-line: forin
+          for (const key in element) {
+            this.detallePerdidas = [...this.detallePerdidas, element[key]];
+          }
+        });
+
+
+        [...this.dataFactura.consumoHistorico].forEach(index => {
+          // tslint:disable-next-line: forin
+          for (const key in index) {
+            this.barChartLabels = [...this.barChartLabels, moment(key).format('YYYY-MM-DD')];
+            data = [...data, index[key]];
+          }
+        });
+
+        this.barChartData = [
+          {
+            data, label: 'kW',
+            backgroundColor: '#043f79',
+          }
+        ];
+        console.log(this.detallePerdidas);
+
+
+      });
+
+  }
+
+  changeEntidad(id) {
+    this.listOfMedidorFiltrado = this.listOfMedidor.filter(x => x.entidadId === id);
   }
 
   imprimir(): void {

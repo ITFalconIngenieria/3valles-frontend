@@ -35,6 +35,11 @@ export class MedidorService {
         return this.http.patch(`${apiUrl}medidors/${id}`, medidor);
     }
 
+    getMedidorEntidad() {
+        return this.http.get(`${apiUrl}v-medidor-entidad-variables?filter={"where":{"entidadId":{"inq":[8,4,5]}}}`);
+    }
+
+
     // Rollover
     getRollover() {
         return this.http.get(`${apiUrl}roll-overs?filter[where][estado]=true`);

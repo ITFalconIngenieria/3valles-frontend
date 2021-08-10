@@ -1,6 +1,6 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { environment } from "src/environments/environment";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 const apiUrl = environment.apiUrl;
 
@@ -25,6 +25,10 @@ export class EntidadService {
 
     deleteEntidad(id, entidad) {
         return this.http.patch(`${apiUrl}entidads/${id}`, entidad);
+    }
+
+    getEntidadFilter() {
+        return this.http.get(`${apiUrl}entidads?filter={"where":{"and":[{"entidad":0},{"estado":true}]}}`)
     }
 
     // medidoresEntidad

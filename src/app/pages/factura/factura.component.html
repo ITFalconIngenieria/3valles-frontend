@@ -1,18 +1,13 @@
 <div class="container-opciones">
     <nz-input-group nzAddOnBefore="Cliente" nzSize="small">
-        <nz-select [(ngModel)]="cliente" nzSize="small" nzPlaceHolder="Seleccione...">
-            <nz-option nzLabel="cliente 1" nzValue="1"></nz-option>
-            <nz-option nzLabel="cliente 2" nzValue="2"></nz-option>
-            <nz-option nzLabel="cliente 3" nzValue="3"></nz-option>
-            <nz-option nzLabel="cliente 4" nzValue="4"></nz-option>
+        <nz-select [(ngModel)]="cliente" nzSize="small" (ngModelChange)="changeEntidad($event)" nzPlaceHolder="Seleccione...">
+            <nz-option *ngFor="let entidad of listOfEntidad" [nzLabel]="entidad.codigo" [nzValue]="entidad.id">
+            </nz-option>
         </nz-select>
     </nz-input-group>
     <nz-input-group nzAddOnBefore="Medidor" nzSize="small">
         <nz-select [(ngModel)]="medidor" nzSize="small" nzPlaceHolder="Seleccione...">
-            <nz-option nzLabel="medidor 1" nzValue="1"></nz-option>
-            <nz-option nzLabel="medidor 2" nzValue="2"></nz-option>
-            <nz-option nzLabel="medidor 3" nzValue="3"></nz-option>
-            <nz-option nzLabel="medidor 4" nzValue="4"></nz-option>
+            <nz-option *ngFor="let medidor of listOfMedidorFiltrado" [nzLabel]="medidor.name + '-' + medidor.medidor " [nzValue]="medidor.id"></nz-option>
         </nz-select>
     </nz-input-group>
     <nz-input-group nzAddOnBefore="Rango tiempo" nzSize="small">
@@ -31,13 +26,13 @@
     </nz-input-group>
     <div class="botones">
         <button nz-button nzType="primary" nzSize="small" (click)="mostrar()" style=" background-color: #027519; border-color: #027519; ">
-      <i nz-icon nzType="search"></i>
-      Mostrar
-  </button>
+            <i nz-icon nzType="search"></i>
+            Mostrar
+        </button>
         <button nz-button nzType="primary" nzSize="small" (click)="imprimir()" style=" background-color: #c41a1a; border-color: #c41a1a; ">
-      <i nz-icon nzType="printer"></i>
-      Imprimir
-  </button>
+            <i nz-icon nzType="printer"></i>
+            Imprimir
+        </button>
     </div>
 </div>
 <br>
@@ -85,23 +80,23 @@
     <div class="container-lecturas">
         <div class="div-valores">
             <p class="titulo-lecturas">Lectura inicial</p>
-            <p class="valor"> 3,589.00 </p>
+            <p class="valor"> {{ dataFactura.lecturaInicial | number:'1.2-2':'en_US'}} </p>
         </div>
         <div class="div-valores">
             <p class="titulo-lecturas">Lectura final</p>
-            <p class="valor"> 10,458.00 </p>
+            <p class="valor"> {{ dataFactura.lecturaFinal | number:'1.2-2':'en_US'}} </p>
         </div>
         <div class="div-valores">
             <p class="titulo-lecturas">Consumo</p>
-            <p class="valor"> 25,458.00 </p>
+            <p class="valor"> {{ dataFactura.consumo | number:'1.2-2':'en_US'}} </p>
         </div>
         <div class="div-valores">
             <p class="titulo-lecturas">Perdidas</p>
-            <p class="valor"> 1,478.00 </p>
+            <p class="valor"> {{ dataFactura.perdidas | number:'1.2-2':'en_US'}} </p>
         </div>
         <div class="div-valores">
             <p class="titulo-lecturas">Total kWh</p>
-            <p class="valor"> 5,423.00 </p>
+            <p class="valor"> {{ dataFactura.total | number:'1.2-2':'en_US'}} </p>
         </div>
     </div>
     <br>
@@ -119,22 +114,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td> Generador </td>
-                        <td style="text-align: right;"> 0.00 </td>
+                    <tr *ngFor="let generador of detallePerdidas; let i = index">
+                        <td> Generador {{ i+1 }}</td>
+                        <td style="text-align: right;"> {{ generador | number:'1.2-2':'en_US'}} </td>
                     </tr>
-                    <tr>
-                        <td> Generador </td>
-                        <td style="text-align: right;"> 0.00 </td>
-                    </tr>
-                    <tr>
-                        <td> Generador </td>
-                        <td style="text-align: right;"> 0.00 </td>
-                    </tr>
-                    <tr>
-                        <td> Generador </td>
-                        <td style="text-align: right;"> 0.00 </td>
-                    </tr>
+
                 </tbody>
                 <tfoot>
                     <tr style="background-color: #578f61b0; text-align: right; font-weight: bold;">
@@ -145,9 +129,9 @@
             </table>
         </div>
         <div>
-            <div style="width: 80%; height: 80%; margin: auto;">
+            <div style="height: 80%; width: 80%; margin: auto;">
                 <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType">
-                      </canvas>
+                </canvas>
             </div>
         </div>
     </div>
