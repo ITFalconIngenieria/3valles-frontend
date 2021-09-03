@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { EntidadModel, ColumnItem } from 'src/app/modelos/entidad';
 import { EntidadService } from 'src/app/servicios/entidad.service';
 import { MedidorService } from 'src/app/servicios/medidores.service';
@@ -63,7 +63,16 @@ export class ConsumidoresComponent implements OnInit {
       sortDirections: ['ascend', 'descend', null],
     }
   ];
-
+  selectTransformadores: EntidadModel [] = [];
+  selectProveedores: EntidadModel [] = [];
+  selectedMedidor: EntidadModel;
+  TransformacionesForm: FormGroup = new FormGroup({
+    CodigoMedidor: new FormControl(null),
+    ProveedorEnergia: new FormControl('default'),
+    NumeroTransformacion: new FormControl(null),
+    Transformador: new FormControl('default'),
+    Observacion: new FormControl(null,)
+  });
   constructor(
     private fb: FormBuilder,
     private entidadService: EntidadService,
@@ -265,6 +274,7 @@ export class ConsumidoresComponent implements OnInit {
   }
 
   editarMedidor(data) {
+    this.selectedMedidor = data;
     this.accion = 'editar';
     const F1 = this.pipe.transform(data.fechaInicial, 'yyyy-MM-dd HH:mm', '+0000');
     const F2 = this.pipe.transform(data.fechaFinal, 'yyyy-MM-dd HH:mm', '+0000');
@@ -382,11 +392,15 @@ export class ConsumidoresComponent implements OnInit {
   }
 
   limpiarTransformacion(): void {
-
+    this.TransformacionesForm.reset();
   }
 
-  showModalTransformacion(): void {
+  async showModalTransformacion(): Promise<void>{
     this.isVisibleTransformacion = true;
+    const transformadores = await this.entidadService.getEntidad(2).toPromise();
+    const proveedores = await this.entidadService.getEntidad(1).toPromise();
+    this.selectTransformadores = transformadores;
+    this.selectProveedores = proveedores;
   }
 
   editarTransformacion(data) { }

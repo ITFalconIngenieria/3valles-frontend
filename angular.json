@@ -1,5 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": "524e5f4b-d4cb-4c2d-aa89-a3c806bcb648"
+  },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
@@ -13,6 +16,10 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "raf",
+              "@babel/runtime-corejs3"
+            ],
             "outputPath": "dist/tresvalles-frontend",
             "index": "src/index.html",
             "main": "src/main.ts",

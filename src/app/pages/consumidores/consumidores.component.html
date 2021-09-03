@@ -128,6 +128,94 @@
     </div>
 </nz-dropdown-menu>
 
+<!-- Modal Transformaciones -->
+<nz-modal
+    [(nzVisible)]= "isVisibleTransformacion"
+    nzTitle="Perdidas en Transformacion"
+    (nzOnCancel)="handleCancelTransformacion()"
+>
+    <div *nzModalContent>
+        <form nz-form nzLayout="vertical" [formGroup]="TransformacionesForm">
+            <div nz-row>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Codigo Medidor</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <input nz-input nzSize="large" disabled  placeholder="#####"/>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="2"></div>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Proovedor Energia</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <nz-select nzSize="large" nzPlaceholder="seleccione el Proveedor" formControlName="ProveedorEnergia">
+                                <nz-option nzLabel="Seleccione Proovedor" nzValue="default" nzHide></nz-option>
+                                <nz-option *ngFor="let data of this.selectProveedores" [nzValue]="data.id" [nzLabel]="data.codigo"></nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <div nz-row>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Numero de Transformacion</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <input nz-input nzSize="large" disabled  placeholder="#####"/>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="2"></div>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Transformador</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <nz-select nzSize="large" nzPlaceholder="seleccione el Proovedor" formControlName="Transformador">
+                                <nz-option nzLabel="Seleccione Transformador" nzValue="default" nzHide></nz-option>
+                                <nz-option *ngFor="let data of this.selectTransformadores" [nzValue]="data.id" [nzLabel]="data.codigo"></nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <div nz-row>
+                <div nz-col nzSpan="24">
+                    <nz-form-item>
+                        <nz-form-label>Observacion</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <textarea rows="4" nz-input formControlName="Observacion"></textarea>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <div nz-row>
+                <div nz-col nzSpan="12"></div>
+                <div nz-col nzSpan="6">
+                    <nz-form-item>
+                        <nz-form-label></nz-form-label>
+                        <nz-form-control>
+                            <button nz-button nzType="default" (click)="handleCancelTransformacion()">Cancelar</button>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="6">
+                    <nz-form-item>
+                        <nz-form-label></nz-form-label>
+                        <nz-form-control>
+                            <button nz-button nzType="primary">Guardar</button>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div *nzModalFooter>
+        <button nz-button nzType="primary" (click)="handleCancelTransformacion()" >Ok</button>
+    </div>
+</nz-modal>
+
 <!-- Draw Medidores -->
 
 <nz-drawer [nzBodyStyle]="{ overflow: 'auto' }" [nzMaskClosable]="false" [nzWidth]="1020" [nzVisible]="visibleDrawer"

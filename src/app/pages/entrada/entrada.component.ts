@@ -1,8 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EntidadModel, ColumnItem } from 'src/app/modelos/entidad';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { EntidadModel, ColumnItem,MedidorEntidadModel } from 'src/app/modelos/entidad';
+import {variableModel} from 'src/app/modelos/medidor';
 import { EntidadService } from 'src/app/servicios/entidad.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import {JerarquiaService} from 'src/app/servicios/jerarquia.service';
+import {MedidorService} from 'src/app/servicios/medidores.service';
+import {DatePipe} from '@angular/common'
+import {JerarquiaModel} from 'src/app/modelos/jerarquia';
+
 
 @Component({
   selector: 'app-entrada',
@@ -10,6 +16,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
   styleUrls: ['./entrada.component.css']
 })
 export class EntradaComponent implements OnInit {
+  pipe = new DatePipe('en-US');
   expandSet = new Set<any>();
   isVisible = false;
   validateForm: FormGroup;
@@ -19,7 +26,7 @@ export class EntradaComponent implements OnInit {
 
   entradaEdit;
   dataEntrada;
-
+  selectedMedidor: EntidadModel;
   listofEntidad: EntidadModel[] = [];
   listOfDisplayData: EntidadModel[] = [];
 
@@ -44,12 +51,21 @@ export class EntradaComponent implements OnInit {
     }
   ];
 
-
+  visibleDrawer: boolean = false;
+  validateFormMedidores: FormGroup;
+  listofMedidor: MedidorEntidadModel[] = [];
+  idMedidor: number;
+  medidorEdit;
+  dataMedidor;
+  listofVariableMedidor: variableModel[] = [];
+  listofJerarquia: JerarquiaModel[] = [];
   constructor(
     private fb: FormBuilder,
     private entidadService: EntidadService,
-    private nzMessageService: NzMessageService
-  ) { }
+    private nzMessageService: NzMessageService,
+    private jerarquiaService: JerarquiaService,
+    private medidorService: MedidorService,
+  ) { }    
 
   onExpandChange(id: any, checked: boolean): void {
     if (checked) {
@@ -90,6 +106,7 @@ export class EntradaComponent implements OnInit {
       }
     );
     this.limpiar();
+    this.limpiarMedidor();
   }
 
   showModal(): void {
@@ -201,4 +218,144 @@ export class EntradaComponent implements OnInit {
     });
   }
 
+  close(): void {
+    this.visibleDrawer = false;
+  }
+
+  openAsignarMedidor(data): void {
+    this.visibleDrawer = true;
+    this.idMedidor = data.id;
+
+    this.entidadService.getMedidorEntidad(this.idMedidor).toPromise().then(
+      (data: MedidorEntidadModel[]) => {
+        this.listofMedidor = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    )
+
+    this.jerarquiaService.getJerarquia().toPromise().then(
+      (data: JerarquiaModel[]) => {
+        this.listofJerarquia = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    )
+
+    this.medidorService.getAllVariablesPME().toPromise().then(
+      (data: variableModel[]) => {
+        this.listofVariableMedidor = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    )
+
+
+  }
+
+  handleOkMedidor(): void {
+    this.visibleDrawer = false;
+  }
+  guardarMedidor():void{
+    const observacion = (this.validateFormMedidores.value.observacion === '' || this.validateFormMedidores.value.observacion === null) ? 'N/A' : this.validateFormMedidores.value.observacion;
+    const F1 = this.pipe.transform(this.validateFormMedidores.value.fecha[0], 'yyyy-MM-dd HH:mm', '-1200');
+    const F2 = this.pipe.transform(this.validateFormMedidores.value.fecha[1], 'yyyy-MM-dd HH:mm', '-1200');
+
+    this.dataMedidor = {
+      variableMedidorId: this.validateFormMedidores.value.variableMedidorId,
+      entidadId: this.idMedidor,
+      fechaInicial: new Date(F1).toISOString(),
+      fechaFinal: new Date(F2).toISOString(),
+      jerarquiaId: this.validateFormMedidores.value.jerarquiaId,
+      observacion,
+      estado: true
+    }
+
+    if (this.accion === 'editar') {
+      this.entidadService.putMedidorEntidad(this.medidorEdit,this.dataMedidor).toPromise().then(
+        (data:MedidorEntidadModel)=>{
+         this.listofMedidor[this.listofMedidor.map(x=>x.id).indexOf(this.medidorEdit)] = data
+         
+          this.accion = 'new';
+          this.limpiarMedidor();
+          this.isVisible = false;
+          this.nzMessageService.success('El registro fue guardado con éxito');
+          this.handleOkMedidor()
+        },
+          (error) => {
+            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+            console.log(error);
+            this.limpiarMedidor();
+            this.accion = 'new';
+            this.isVisible = false;
+          }
+          
+      )
+    }else{
+      this.entidadService.postMedidorEntidad(this.dataMedidor)
+      .toPromise()
+      .then(
+        (data:MedidorEntidadModel) => {
+          this.listofMedidor = [...this.listofMedidor, data];
+          this.nzMessageService.success('El registro fue guardado con éxito');
+          this.limpiarMedidor();
+        },
+        (error) => {
+          this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+          this.limpiarMedidor();
+        }
+      )
+    }
+  }
+
+  submitFormMedidores(){
+    for (const i in this.validateFormMedidores.controls) {
+      this.validateFormMedidores.controls[i].markAsDirty();
+      this.validateFormMedidores.controls[i].updateValueAndValidity();
+    }
+  }
+
+  limpiarMedidor(): void {
+    this.validateFormMedidores = this.fb.group({
+      variableMedidorId: [null, [Validators.required]],
+      jerarquiaId: [null, [Validators.required]],
+      fecha: [null],
+      observacion: ['']
+    });
+  }
+  
+  eliminarMedidor(data) { 
+    this.entidadService.deleteMedidorEntidad(data.id, { estado: false }).toPromise().then(
+      ()=>{
+        this.nzMessageService.success('El registro fue eliminado con éxito');
+        this.listofMedidor = this.listofMedidor.filter(x => x.id !== data.id);
+      }, (error) => {
+        this.nzMessageService.warning('El registro no pudo ser eleminado, por favor intente de nuevo o contactese con su administrador');
+        console.log(error);
+      }
+    )
+  }
+
+  editarMedidor(data) {
+    this.selectedMedidor = data;
+    this.accion = 'editar';
+    const F1 = this.pipe.transform(data.fechaInicial, 'yyyy-MM-dd HH:mm', '+0000');
+    const F2 = this.pipe.transform(data.fechaFinal, 'yyyy-MM-dd HH:mm', '+0000');
+    this.medidorEdit=data.id
+
+    this.validateFormMedidores = this.fb.group({
+      variableMedidorId: [data.variableMedidorId, [Validators.required]],
+      jerarquiaId: [data.jerarquiaId, [Validators.required]],
+      fecha: [[F1, F2]],
+      observacion: [data.observacion],
+    })
+
+  }
 }
