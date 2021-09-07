@@ -54,3 +54,18 @@
 .ant-form-item{
   text-align: end;
 }
+
+.centered-header{
+  text-align: center;
+  vertical-align: middle;
+  color: gray;
+  font-weight: bold;
+}
+
+.icon-color{
+  color: gray;
+}
+
+.light-text{
+  color: #444444;
+}
