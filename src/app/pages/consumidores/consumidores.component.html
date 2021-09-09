@@ -216,7 +216,7 @@
                             <td class="light-text" >{{data.proveedor.codigo}}</td>
                             <td>
                                 <button nz-button nzType="link" nzShape="circle"><i class="icon-color" nz-icon nzType="edit" nzTheme="outline"></i></button>
-                                <button nz-button nzType="link" nzShape="circle"><i class="icon-color" nz-icon nzType="delete" nzTheme="outline"></i></button>
+                                <button nz-button nzType="link" nzShape="circle" *ngIf="data.canDelete" (click)="eliminarTransformacion(data)"><i class="delete-icon-color" nz-icon nzType="delete" nzTheme="outline"></i></button>
                             </td>
                         </tr>
                     </tbody>

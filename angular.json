@@ -18,7 +18,8 @@
           "options": {
             "allowedCommonJsDependencies": [
               "raf",
-              "@babel/runtime-corejs3"
+              "@babel/runtime-corejs3",
+              "lodash"
             ],
             "outputPath": "dist/tresvalles-frontend",
             "index": "src/index.html",

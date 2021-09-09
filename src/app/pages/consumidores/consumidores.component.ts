@@ -11,6 +11,7 @@ import { JerarquiaModel } from '../../modelos/jerarquia';
 import { variableModel } from '../../modelos/medidor';
 import { DatePipe } from '@angular/common';
 import { Transformaciones, TransformacionesView } from 'src/app/modelos/transformaciones';
+import _ from 'lodash';
 
 
 @Component({
@@ -415,8 +416,13 @@ export class ConsumidoresComponent implements OnInit {
         const result = await this.transformacionesService.postTransformaciones(tranformacionObject).toPromise();
         const newObject = this.transformacionesService.createViewObject(result,this.selectTransformadores,this.selectProveedores);
         this.transformacionesTableData = [...this.transformacionesTableData,newObject];
+        let indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+        this.transformacionesTableData[indexOfDelete].canDelete = false;
         this.numeroTransformacion = result.numeroTransf;
+        indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+        this.transformacionesTableData[indexOfDelete].canDelete = true;
         this.TransformacionesForm.get('NumeroTransformacion').setValue(this.numeroTransformacion);
+        this.TransformacionesForm.get('Observacion').setValue('');
       } catch (error) {
         this.nzMessageService.error('Ha occurido un error inesperado');
         console.error(error);
@@ -451,6 +457,9 @@ export class ConsumidoresComponent implements OnInit {
               this.transformacionesService.createViewObject(tranf,this.selectTransformadores,this.selectProveedores)
             ]
       });
+      
+      const indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+      this.transformacionesTableData[indexOfDelete].canDelete = true
       console.log(this.transformacionesTableData);
       this.loadingTransformacionesTable = false;
     }else{
@@ -461,7 +470,39 @@ export class ConsumidoresComponent implements OnInit {
   editarTransformacion(data) { }
 
 
-  eliminarTransformacion(data) { }
+  async eliminarTransformacion(data:TransformacionesView): Promise<void> { 
+    //Primero eliminar el objeto y luego cargar
+      const bodyObject: Transformaciones = {
+        id: data.id,
+        clienteId: this.idMedidor,
+        proveedorId: data.proveedor.id,
+        transformadorId: data.transformador.id,
+        numeroTransf: this.numeroTransformacion.valueOf(),
+        fechaInicial:'2021-09-07T16:32:44.706Z',
+        fechaFinal: '2021-09-07T16:32:44.706Z',
+        observacion: 'N/A',
+        estado: false
+      }
+      await this.transformacionesService.deleteTransformaciones(data.id,bodyObject).toPromise();
+    
+      this.transformacionesTableData = [];
+        this.visibleTransformacionesTable = true;
+        this.loadingTransformacionesTable = true;
+        const transformaciones = await this.transformacionesService.getTransformacionesById(this.idMedidor,this.TransformacionesForm.get('Transformador').value,this.TransformacionesForm.get('ProveedorEnergia').value).toPromise()
+        this.numeroTransformacion = this.transformacionesService.handleNumeroTransformacion(transformaciones);
+        this.TransformacionesForm.get('NumeroTransformacion').setValue(this.numeroTransformacion);
+        transformaciones.forEach((tranf)=>{
+            this.transformacionesTableData = 
+              [
+                ...this.transformacionesTableData,
+                this.transformacionesService.createViewObject(tranf,this.selectTransformadores,this.selectProveedores)
+              ]
+        });
 
-
+        const indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+        this.transformacionesTableData[indexOfDelete].canDelete = true
+        console.log(this.transformacionesTableData);
+        this.loadingTransformacionesTable = false;
+    
+  }
 }

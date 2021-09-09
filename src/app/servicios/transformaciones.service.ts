@@ -37,7 +37,8 @@ export class TransformacionesService {
             id: data.id,
             numeroTransf: data.numeroTransf,
             proveedor: _.find(proovedores,(prov)=> prov.id === data.proveedorId),
-            transformador: _.find(transformadores,(tranf)=> tranf.id === data.transformadorId)
+            transformador: _.find(transformadores,(tranf)=> tranf.id === data.transformadorId),
+            canDelete: false
         }
 
         return returnObject;

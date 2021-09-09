@@ -17,4 +17,5 @@ export interface TransformacionesView{
     proveedor: EntidadModel;
     transformador: EntidadModel;
     numeroTransf: number;
+    canDelete: boolean;
 }
