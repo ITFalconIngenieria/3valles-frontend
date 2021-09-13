@@ -12,7 +12,7 @@ import { variableModel } from '../../modelos/medidor';
 import { DatePipe } from '@angular/common';
 import { Transformaciones, TransformacionesView } from 'src/app/modelos/transformaciones';
 import _ from 'lodash';
-
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-consumidores',
@@ -25,6 +25,8 @@ export class ConsumidoresComponent implements OnInit {
   isVisible = false;
   isVisibleTransformacion = false;
   visibleDrawer = false;
+  visibleEditarButton = false;
+  loadingEditarButton = false;
 
   validateForm: FormGroup;
   validateFormMedidores: FormGroup;
@@ -83,6 +85,7 @@ export class ConsumidoresComponent implements OnInit {
   transformacionesTableData: TransformacionesView[] = [];
   loadingButtonPostTransformaciones: Boolean = false;
   numeroTransformacion: Number = 1;
+  selectedTransformacion: TransformacionesView;
   constructor(
     private fb: FormBuilder,
     private entidadService: EntidadService,
@@ -467,8 +470,35 @@ export class ConsumidoresComponent implements OnInit {
     }
   }
 
-  editarTransformacion(data) { }
+  editarTransformacion(data) { 
+    this.selectedTransformacion = data;
+    this.TransformacionesForm.get('Observacion').setValue(data.observacion)
+    this.visibleEditarButton = true;
+  }
 
+  async handleEditTransformacion(){
+    this.loadingEditarButton = true;
+    
+    const tranformacionObject ={
+      clienteId: this.idMedidor,
+      proveedorId: this.selectedTransformacion.proveedor.id,
+      transformadorId: this.selectedTransformacion.transformador.id,
+      numeroTransf: this.selectedTransformacion.numeroTransf,
+      fechaInicial: moment().toISOString(true),
+      fechaFinal: moment().toISOString(true),
+      observacion: this.TransformacionesForm.get('Observacion').value,
+      estado: true
+    }
+    try {
+      await this.transformacionesService.putTransformaciones(this.selectedTransformacion.id,tranformacionObject).toPromise();
+      this.nzMessageService.success("Registro modificado");
+    }catch (error){
+      console.log(error);
+    }
+
+    this.loadingEditarButton = false;
+    this.visibleEditarButton = false;
+  }
 
   async eliminarTransformacion(data:TransformacionesView): Promise<void> { 
     //Primero eliminar el objeto y luego cargar
@@ -478,8 +508,8 @@ export class ConsumidoresComponent implements OnInit {
         proveedorId: data.proveedor.id,
         transformadorId: data.transformador.id,
         numeroTransf: this.numeroTransformacion.valueOf(),
-        fechaInicial:'2021-09-07T16:32:44.706Z',
-        fechaFinal: '2021-09-07T16:32:44.706Z',
+        fechaInicial: moment().toISOString(true),
+        fechaFinal: moment().toISOString(true),
         observacion: 'N/A',
         estado: false
       }
