@@ -410,8 +410,8 @@ export class ConsumidoresComponent implements OnInit {
         proveedorId: this.TransformacionesForm.get('ProveedorEnergia').value,
         transformadorId: this.TransformacionesForm.get('Transformador').value,
         numeroTransf: nextTransformacion,
-        fechaInicial: "2021-09-07T16:32:44.706Z",
-        fechaFinal: "2021-09-07T16:32:44.706Z",
+        fechaInicial: moment().toISOString(true),
+        fechaFinal: moment().toISOString(true),
         observacion: this.TransformacionesForm.get('Observacion').value,
         estado: true
       }
