@@ -473,7 +473,15 @@ export class ConsumidoresComponent implements OnInit {
   editarTransformacion(data) { 
     this.selectedTransformacion = data;
     this.TransformacionesForm.get('Observacion').setValue(data.observacion)
+    this.TransformacionesForm.get('NumeroTransformacion').setValue(data.numeroTransf);
     this.visibleEditarButton = true;
+  }
+
+  handleCancelEditar() {
+    this.selectedTransformacion = null;
+    this.TransformacionesForm.get('Observacion').setValue('');
+    this.TransformacionesForm.get('NumeroTransformacion').setValue(this.numeroTransformacion);
+    this.visibleEditarButton = false;
   }
 
   async handleEditTransformacion(){
@@ -495,7 +503,7 @@ export class ConsumidoresComponent implements OnInit {
     }catch (error){
       console.log(error);
     }
-
+    this.TransformacionesForm.get('Observacion').setValue('');
     this.loadingEditarButton = false;
     this.visibleEditarButton = false;
   }

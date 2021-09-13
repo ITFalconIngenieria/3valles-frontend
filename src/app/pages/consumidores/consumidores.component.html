@@ -178,7 +178,11 @@
                     </nz-form-item>
                 </div>
             </div>
-            <button nz-button nzType="default" *ngIf="visibleEditarButton" [nzLoading]="loadingEditarButton" (click)="handleEditTransformacion()">Editar</button>
+            <div nz-row>
+                <button nz-button nzType="default" *ngIf="visibleEditarButton" [nzLoading]="loadingEditarButton" (click)="handleEditTransformacion()">Editar</button>
+                <div nz-col nzSpan="1"></div>
+                <button nz-button nzType="danger" *ngIf="visibleEditarButton" (click)="handleCancelEditar()">Cancelar</button>
+            </div>
             <div nz-row>
                 <div nz-col nzSpan="12"></div>
                 <div nz-col nzSpan="6">
