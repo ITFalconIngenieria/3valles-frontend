@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
+import { EntidadModel } from '../modelos/entidad';
 
 const apiUrl = environment.apiUrl;
 
@@ -12,7 +13,7 @@ export class EntidadService {
     constructor(private http: HttpClient) { }
 
     getEntidad(tipo) {
-        return this.http.get(`${apiUrl}entidads?filter[where][and][0][estado]=true&filter[where][and][1][entidad]=${tipo}`)
+        return this.http.get<EntidadModel[]>(`${apiUrl}entidads?filter[where][and][0][estado]=true&filter[where][and][1][entidad]=${tipo}`)
     }
 
     postEntidad(entidad) {

@@ -104,17 +104,6 @@
     </div>
 </nz-modal>
 
-<!-- Modal Transformaciones -->
-<nz-modal [(nzVisible)]="isVisibleTransformacion" nzTitle="Perdidas en Transformacion"
-    (nzOnCancel)="handleCancelTransformacion()">
-    <ng-container *nzModalContent>
-
-    </ng-container>
-    <div *nzModalFooter>
-        <button nz-button nzType="primary" (click)="handleOkTransformacion()">OK</button>
-    </div>
-</nz-modal>
-
 <nz-dropdown-menu #menu="nzDropdownMenu">
     <div class="ant-table-filter-dropdown">
         <div class="search-box">
@@ -127,6 +116,123 @@
         </div>
     </div>
 </nz-dropdown-menu>
+
+<!-- Modal Transformaciones -->
+<nz-modal
+    [(nzVisible)]= "isVisibleTransformacion"
+    nzTitle="Perdidas en Transformacion"
+    (nzOnCancel)="handleCancelTransformacion()"
+    nzWidth="600px"
+>
+    <div *nzModalContent>
+        <form nz-form nzLayout="vertical" [formGroup]="TransformacionesForm">
+            <div nz-row>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Codigo Medidor</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <input nz-input nzSize="large" disabled  placeholder="#####"/>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="2"></div>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Proovedor Energia</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <nz-select nzAllowClear nzSize="large" nzPlaceholder="seleccione el Proveedor" formControlName="ProveedorEnergia" (ngModelChange)="handleShowTableTransformacion()">
+                                <nz-option *ngFor="let data of this.selectProveedores" [nzValue]="data.id" [nzLabel]="data.codigo"></nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <div nz-row>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Numero de Transformacion</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <input nz-input nzSize="large" disabled  placeholder="#####" formControlName="NumeroTransformacion" readonly="readonly"/>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="2"></div>
+                <div nz-col nzSpan="11">
+                    <nz-form-item>
+                        <nz-form-label>Transformador</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <nz-select nzAllowClear nzSize="large" nzPlaceholder="seleccione el Proovedor" formControlName="Transformador" (ngModelChange)="handleShowTableTransformacion()">
+                                <nz-option *ngFor="let data of this.selectTransformadores" [nzValue]="data.id" [nzLabel]="data.codigo"></nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <div nz-row>
+                <div nz-col nzSpan="24">
+                    <nz-form-item>
+                        <nz-form-label>Observacion</nz-form-label>
+                        <nz-form-control nzErrorTip="verifique">
+                            <textarea rows="4" nz-input formControlName="Observacion"></textarea>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <div nz-row>
+                <button nz-button nzType="default" *ngIf="visibleEditarButton" [nzLoading]="loadingEditarButton" (click)="handleEditTransformacion()">Editar</button>
+                <div nz-col nzSpan="1"></div>
+                <button nz-button nzType="danger" *ngIf="visibleEditarButton" (click)="handleCancelEditar()">Cancelar</button>
+            </div>
+            <div nz-row>
+                <div nz-col nzSpan="12"></div>
+                <div nz-col nzSpan="6">
+                    <nz-form-item>
+                        <nz-form-label></nz-form-label>
+                        <nz-form-control>
+                            <button nz-button nzType="default" (click)="handleCancelTransformacion()">Cancelar</button>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="6">
+                    <nz-form-item>
+                        <nz-form-label></nz-form-label>
+                        <nz-form-control>
+                            <button nz-button nzType="primary" (click)="handleGuardarTransformacion()" [nzLoading]="loadingButtonPostTransformaciones">Guardar</button>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+        </form>
+        <div nz-row>
+            <div nz-col nzSpan="24" *ngIf="visibleTransformacionesTable && transformacionesTableData.length">
+                <nz-table #transfTable [nzData]="transformacionesTableData" [nzLoading]="loadingTransformacionesTable"  nzPaginationType="small" nzBordered nzOuterBordered	>
+                    <thead>
+                        <tr>
+                            <td class="centered-header">Numero de Transformacion</td>
+                            <td class="centered-header">Transformador</td>
+                            <td class="centered-header">Proovedor</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let data of transfTable.data">
+                            <td class="light-text" >{{data.numeroTransf}}</td>
+                            <td class="light-text" >{{data.transformador.codigo}}</td>
+                            <td class="light-text" >{{data.proveedor.codigo}}</td>
+                            <td>
+                                <button nz-button nzType="link" nzShape="circle" (click)="editarTransformacion(data)"><i class="icon-color" nz-icon nzType="edit" nzTheme="outline"></i></button>
+                                <button nz-button nzType="link" nzShape="circle" *ngIf="data.canDelete" (click)="eliminarTransformacion(data)"><i class="delete-icon-color" nz-icon nzType="delete" nzTheme="outline"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </nz-table>
+            </div>
+        </div>
+    </div>
+    <div *nzModalFooter>
+        <button nz-button nzType="primary" (click)="handleCancelTransformacion()" >Ok</button>
+    </div>
+</nz-modal>
 
 <!-- Draw Medidores -->
 

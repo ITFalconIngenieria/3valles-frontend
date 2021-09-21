@@ -1,14 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { EntidadModel, ColumnItem } from 'src/app/modelos/entidad';
 import { EntidadService } from 'src/app/servicios/entidad.service';
 import { MedidorService } from 'src/app/servicios/medidores.service';
 import { JerarquiaService } from 'src/app/servicios/jerarquia.service';
+import {TransformacionesService} from 'src/app/servicios/transformaciones.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { MedidorEntidadModel } from '../../modelos/entidad';
 import { JerarquiaModel } from '../../modelos/jerarquia';
 import { variableModel } from '../../modelos/medidor';
 import { DatePipe } from '@angular/common';
+import { Transformaciones, TransformacionesView } from 'src/app/modelos/transformaciones';
+import _ from 'lodash';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-consumidores',
@@ -21,6 +25,8 @@ export class ConsumidoresComponent implements OnInit {
   isVisible = false;
   isVisibleTransformacion = false;
   visibleDrawer = false;
+  visibleEditarButton = false;
+  loadingEditarButton = false;
 
   validateForm: FormGroup;
   validateFormMedidores: FormGroup;
@@ -63,13 +69,30 @@ export class ConsumidoresComponent implements OnInit {
       sortDirections: ['ascend', 'descend', null],
     }
   ];
+  selectTransformadores: EntidadModel [] = [];
+  selectProveedores: EntidadModel [] = [];
+  selectedMedidor: EntidadModel;
+  TransformacionesForm: FormGroup = new FormGroup({
+    CodigoMedidor: new FormControl(null),
+    ProveedorEnergia: new FormControl(null),
+    NumeroTransformacion: new FormControl(null),
+    Transformador: new FormControl(null),
+    Observacion: new FormControl(null,)
+  });
 
+  visibleTransformacionesTable: Boolean = false;
+  loadingTransformacionesTable: Boolean = false;
+  transformacionesTableData: TransformacionesView[] = [];
+  loadingButtonPostTransformaciones: Boolean = false;
+  numeroTransformacion: Number = 1;
+  selectedTransformacion: TransformacionesView;
   constructor(
     private fb: FormBuilder,
     private entidadService: EntidadService,
     private jerarquiaService: JerarquiaService,
     private medidorService: MedidorService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private transformacionesService: TransformacionesService
   ) { }
 
   onExpandChange(id: any, checked: boolean): void {
@@ -265,6 +288,7 @@ export class ConsumidoresComponent implements OnInit {
   }
 
   editarMedidor(data) {
+    this.selectedMedidor = data;
     this.accion = 'editar';
     const F1 = this.pipe.transform(data.fechaInicial, 'yyyy-MM-dd HH:mm', '+0000');
     const F2 = this.pipe.transform(data.fechaFinal, 'yyyy-MM-dd HH:mm', '+0000');
@@ -373,25 +397,150 @@ export class ConsumidoresComponent implements OnInit {
   //TRANSFORMACIONES
   handleCancelTransformacion(): void {
     this.isVisibleTransformacion = false;
-    this.accionTransformacion = 'new';
+    this.transformacionesTableData = [];
+    this.numeroTransformacion = 1;
     this.limpiarTransformacion();
   }
 
-  handleOkTransformacion(): void {
-    this.isVisibleTransformacion = false;
+  async handleGuardarTransformacion(): Promise<void> {
+      this.loadingButtonPostTransformaciones = true;
+      const nextTransformacion = this.numeroTransformacion.valueOf() + 1;
+      const tranformacionObject ={
+        clienteId: this.idMedidor,
+        proveedorId: this.TransformacionesForm.get('ProveedorEnergia').value,
+        transformadorId: this.TransformacionesForm.get('Transformador').value,
+        numeroTransf: nextTransformacion,
+        fechaInicial: moment().toISOString(true),
+        fechaFinal: moment().toISOString(true),
+        observacion: this.TransformacionesForm.get('Observacion').value,
+        estado: true
+      }
+      try {
+        const result = await this.transformacionesService.postTransformaciones(tranformacionObject).toPromise();
+        const newObject = this.transformacionesService.createViewObject(result,this.selectTransformadores,this.selectProveedores);
+        this.transformacionesTableData = [...this.transformacionesTableData,newObject];
+        let indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+        this.transformacionesTableData[indexOfDelete].canDelete = false;
+        this.numeroTransformacion = result.numeroTransf;
+        indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+        this.transformacionesTableData[indexOfDelete].canDelete = true;
+        this.TransformacionesForm.get('NumeroTransformacion').setValue(this.numeroTransformacion);
+        this.TransformacionesForm.get('Observacion').setValue('');
+      } catch (error) {
+        this.nzMessageService.error('Ha occurido un error inesperado');
+        console.error(error);
+      }
+      this.loadingButtonPostTransformaciones = false;
   }
 
   limpiarTransformacion(): void {
-
+    this.TransformacionesForm.reset();
   }
 
-  showModalTransformacion(): void {
+  async showModalTransformacion(): Promise<void>{
     this.isVisibleTransformacion = true;
+    const transformadores = await this.entidadService.getEntidad(2).toPromise();
+    const proveedores = await this.entidadService.getEntidad(1).toPromise();
+    this.selectTransformadores = transformadores;
+    this.selectProveedores = proveedores;
   }
 
-  editarTransformacion(data) { }
+  async handleShowTableTransformacion(): Promise<void>{
+    if(this.TransformacionesForm.get('Transformador').value && this.TransformacionesForm.get('ProveedorEnergia').value){
+      this.transformacionesTableData = [];
+      this.visibleTransformacionesTable = true;
+      this.loadingTransformacionesTable = true;
+      const transformaciones = await this.transformacionesService.getTransformacionesById(this.idMedidor,this.TransformacionesForm.get('Transformador').value,this.TransformacionesForm.get('ProveedorEnergia').value).toPromise()
+      this.numeroTransformacion = this.transformacionesService.handleNumeroTransformacion(transformaciones);
+      this.TransformacionesForm.get('NumeroTransformacion').setValue(this.numeroTransformacion);
+      transformaciones.forEach((tranf)=>{
+          this.transformacionesTableData = 
+            [
+              ...this.transformacionesTableData,
+              this.transformacionesService.createViewObject(tranf,this.selectTransformadores,this.selectProveedores)
+            ]
+      });
+      
+      const indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+      this.transformacionesTableData[indexOfDelete].canDelete = true
+      console.log(this.transformacionesTableData);
+      this.loadingTransformacionesTable = false;
+    }else{
+      this.visibleTransformacionesTable = false;
+    }
+  }
 
+  editarTransformacion(data) { 
+    this.selectedTransformacion = data;
+    this.TransformacionesForm.get('Observacion').setValue(data.observacion)
+    this.TransformacionesForm.get('NumeroTransformacion').setValue(data.numeroTransf);
+    this.visibleEditarButton = true;
+  }
 
-  eliminarTransformacion(data) { }
+  handleCancelEditar() {
+    this.selectedTransformacion = null;
+    this.TransformacionesForm.get('Observacion').setValue('');
+    this.TransformacionesForm.get('NumeroTransformacion').setValue(this.numeroTransformacion);
+    this.visibleEditarButton = false;
+  }
 
+  async handleEditTransformacion(){
+    this.loadingEditarButton = true;
+    
+    const tranformacionObject ={
+      clienteId: this.idMedidor,
+      proveedorId: this.selectedTransformacion.proveedor.id,
+      transformadorId: this.selectedTransformacion.transformador.id,
+      numeroTransf: this.selectedTransformacion.numeroTransf,
+      fechaInicial: moment().toISOString(true),
+      fechaFinal: moment().toISOString(true),
+      observacion: this.TransformacionesForm.get('Observacion').value,
+      estado: true
+    }
+    try {
+      await this.transformacionesService.putTransformaciones(this.selectedTransformacion.id,tranformacionObject).toPromise();
+      this.nzMessageService.success("Registro modificado");
+    }catch (error){
+      console.log(error);
+    }
+    this.TransformacionesForm.get('Observacion').setValue('');
+    this.loadingEditarButton = false;
+    this.visibleEditarButton = false;
+  }
+
+  async eliminarTransformacion(data:TransformacionesView): Promise<void> { 
+    //Primero eliminar el objeto y luego cargar
+      const bodyObject: Transformaciones = {
+        id: data.id,
+        clienteId: this.idMedidor,
+        proveedorId: data.proveedor.id,
+        transformadorId: data.transformador.id,
+        numeroTransf: this.numeroTransformacion.valueOf(),
+        fechaInicial: moment().toISOString(true),
+        fechaFinal: moment().toISOString(true),
+        observacion: 'N/A',
+        estado: false
+      }
+      await this.transformacionesService.deleteTransformaciones(data.id,bodyObject).toPromise();
+    
+      this.transformacionesTableData = [];
+        this.visibleTransformacionesTable = true;
+        this.loadingTransformacionesTable = true;
+        const transformaciones = await this.transformacionesService.getTransformacionesById(this.idMedidor,this.TransformacionesForm.get('Transformador').value,this.TransformacionesForm.get('ProveedorEnergia').value).toPromise()
+        this.numeroTransformacion = this.transformacionesService.handleNumeroTransformacion(transformaciones);
+        this.TransformacionesForm.get('NumeroTransformacion').setValue(this.numeroTransformacion);
+        transformaciones.forEach((tranf)=>{
+            this.transformacionesTableData = 
+              [
+                ...this.transformacionesTableData,
+                this.transformacionesService.createViewObject(tranf,this.selectTransformadores,this.selectProveedores)
+              ]
+        });
+
+        const indexOfDelete = this.numeroTransformacion.valueOf() - 1;
+        this.transformacionesTableData[indexOfDelete].canDelete = true
+        console.log(this.transformacionesTableData);
+        this.loadingTransformacionesTable = false;
+    
+  }
 }
