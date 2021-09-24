@@ -33,6 +33,7 @@ export class MedidorComponent implements OnInit {
   listofMedidor: MedidorModel[] = [];
   listOfDisplayData: MedidorModel[] = [];
   listOfPME: any[] = [];
+  listOfPME2: any[] = [];
   listOfVariable: variableModel[] = [];
   listOfVariablePME: variableModel[] = [];
  // listOfDataRollover: RolloverModel[] = [];
@@ -195,6 +196,8 @@ export class MedidorComponent implements OnInit {
           this.listofMedidor = [...this.listofMedidor, data];
           this.listOfDisplayData = [...this.listofMedidor];
           this.nzMessageService.success('El registro fue guardado con éxito');
+          this.limpiar();
+          this.accion = 'new';
         },
           (error) => {
             this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
@@ -418,7 +421,7 @@ export class MedidorComponent implements OnInit {
 
       this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
         (data: variableModel[]) => {
-          this.listOfPME = data;
+          this.listOfPME2 = data;
         },
         (error) => {
           this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
@@ -459,7 +462,7 @@ export class MedidorComponent implements OnInit {
         .toPromise()
         .then(
           (datar:any) => {
-            for (const item of this.listOfPME.filter(x => x.id === this.idVariable)) {
+            for (const item of this.listOfPME2.filter(x => x.id === this.idVariable)) {
               item.id=datar.id;
               item.variableMedidorId = datar.variableMedidorId;
               item.medidorId = datar.medidorId;
@@ -483,7 +486,7 @@ export class MedidorComponent implements OnInit {
       }else{
         this.medidorService.postVariable(dataVariable).toPromise().then(
           (data) => {
-            this.listOfPME = [...this.listOfPME, data];
+            this.listOfPME2 = [...this.listOfPME2, data];
             this.nzMessageService.success('El registro fue guardado con éxito');
             this.limpiarVariables();
           },
@@ -512,7 +515,7 @@ export class MedidorComponent implements OnInit {
       .then(
         () => {
           this.nzMessageService.success('El registro fue eliminado con éxito');
-          this.listOfPME = this.listOfPME.filter(x => x.id !== data.id);
+          this.listOfPME2 = this.listOfPME2.filter(x => x.id !== data.id);
         //  this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
         },
         (error) => {

@@ -1,62 +1,138 @@
 <div class="container-graficos">
-    <nz-input-group nzAddOnBefore="Rango tiempo" nzSize="small">
-        <nz-select nzSize="small" [(ngModel)]="tiempo">
-            <nz-option nzLabel="Hoy" nzValue="1"></nz-option>
-            <nz-option nzLabel="Ayer" nzValue="2"></nz-option>
-            <nz-option nzLabel="Desde ayer" nzValue="3"></nz-option>
-            <nz-option nzLabel="Semana hasta la fecha" nzValue="4"></nz-option>
-            <nz-option nzLabel="Año hasta la fecha" nzValue="5"></nz-option>
-            <nz-option nzLabel="Ultima semana" nzValue="6"></nz-option>
-            <nz-option nzLabel="Ultimas 2 semanas" nzValue="7"></nz-option>
-            <nz-option nzLabel="Este mes" nzValue="8"></nz-option>
-            <nz-option nzLabel="Ultimo mes" nzValue="9"></nz-option>
-            <nz-option nzLabel="Ultimo año" nzValue="10"></nz-option>
+    <nz-input-group nzAddOnBefore="Rango de Tiempo" nzSize="small">
+        <nz-select (ngModelChange)="changeRango($event)" nzSize="small" [(ngModel)]="tiempo">
+            <nz-option-group nzLabel="Especificar Fecha">
+                <nz-option nzLabel="Inicial y Final" nzValue="11"></nz-option>
+            </nz-option-group>
+            <nz-option-group nzLabel="Rangos Hasta la Fecha">
+                <nz-option nzLabel="Hoy" nzValue="1"></nz-option>
+                <nz-option nzLabel="Ayer" nzValue="2"></nz-option>
+                <nz-option nzLabel="Desde ayer" nzValue="3"></nz-option>
+                <nz-option nzLabel="Semana hasta la fecha" nzValue="4"></nz-option>
+                <nz-option nzLabel="Este mes hasta la fecha" nzValue="8"></nz-option>
+                <nz-option nzLabel="Año hasta la fecha" nzValue="5"></nz-option>
+            </nz-option-group>
+            <nz-option-group nzLabel="Fechas Pasadas">
+                <nz-option nzLabel="Ultima semana" nzValue="6"></nz-option>
+                <nz-option nzLabel="Ultimas 2 semanas" nzValue="7"></nz-option>
+                <nz-option nzLabel="Ultimo mes" nzValue="9"></nz-option>
+                <nz-option nzLabel="Ultimo año" nzValue="10"></nz-option>
+            </nz-option-group>
         </nz-select>
     </nz-input-group>
+    <nz-input-group id="fecha" nzAddOnBefore="Fecha" nzSize="small" *ngIf="visibleFecha">
+        <nz-range-picker nzSize="small" nzFormat="yyyy-MM-dd HH:mm" [(ngModel)]="fecha"></nz-range-picker>
+    </nz-input-group>
     <div class="botones">
-        <button nz-button nzType="primary" nzSize="small" (click)="mostrar()" style=" background-color: #027519; border-color: #027519; ">
-      <i nz-icon nzType="search"></i>
-      Mostrar
-  </button>
-        <button nz-button nzType="primary" nzSize="small" (click)="imprimir()" style=" background-color: #c41a1a; border-color: #c41a1a; ">
-      <i nz-icon nzType="printer"></i>
-      Imprimir
-  </button>
+        <button nz-button nzType="primary" nzSize="small" (click)="mostrar()"
+            style=" background-color: #027519; border-color: #027519; ">
+            <i nz-icon nzType="search"></i>
+            Mostrar
+        </button>
+        <button nz-button nzType="primary" nzSize="small" (click)="imprimir()"
+            style=" background-color: #c41a1a; border-color: #c41a1a; ">
+            <i nz-icon nzType="printer"></i>
+            Imprimir
+        </button>
     </div>
 
 </div>
 <br>
 <div id="content" *ngIf="visible">
-    <br>
-    <p style="font-family: 'Baloo Paaji 2', cursive; font-size: 40px; color: #8a8a8a;">Dasboard</p>
+    <p style="font-family: 'Baloo Paaji 2', cursive; font-size: 40px; color: #8a8a8a;">Dashboard del {{fecha1}} al
+        {{fecha2}}</p>
     <div class="container-valores">
         <div class="div-border">
-            <p class="titulos-valores">Venta a ENEE</p>
-            <p class="valor"> 1,234,654.00 kWh</p>
-        </div>
-        <div class="div-border">
             <p class="titulos-valores">Generación kWh</p>
-            <p class="valor"> 1,234,654.00 kWh</p>
+            <p class="valor"> {{generacion | number:'1.0':'en_US'}} kWh</p>
         </div>
         <div class="div-border">
-            <p class="titulos-valores">Pérdidad kWh</p>
-            <p class="valor"> 1,234,654.00 kWh</p>
+            <p class="titulos-valores">Compra Enee</p>
+            <p class="valor"> {{compraEnee | number:'1.0':'en_US'}} kWh</p>
+        </div>
+        <div class="div-border">
+            <p class="titulos-valores">Venta a ENEE</p>
+            <p class="valor">{{ventaEnee | number:'1.0':'en_US'}}</p>
+        </div>
+        <div class="div-border">
+            <p class="titulos-valores">Consumo Interno</p>
+            <p class="valor"> {{consumo | number:'1.0':'en_US'}} kWh</p>
         </div>
         <div>
-            <p class="titulos-valores">Consumo</p>
-            <p class="valor"> 1,234,654.00 kWh</p>
+            <p class="titulos-valores">Pérdidas kWh</p>
+            <p class="valor"> {{perdida | number:'1.0':'en_US'}} kWh</p>
         </div>
     </div>
     <hr style="background-color: #eaeaea; height: 5px; border: none;">
     <div class="container-graficos">
         <div class="div-border" style="width: 90%; margin: auto;">
             <h2 class="titulos-grafico">Generaciones</h2>
-            <canvas baseChart [datasets]="ChartGenetData" [labels]="ChartGenetLabels" [options]="ChartGenetOptions" [legend]="ChartGenetLegend" [chartType]="ChartGenetType">
-                </canvas>
+            <canvas baseChart [datasets]="ChartGenetData" [labels]="ChartGenetLabels" [options]="ChartGenetOptions"
+                [legend]="ChartGenetLegend" [chartType]="ChartGenetType">
+            </canvas>
         </div>
         <div style="width: 90%; margin: auto;">
             <h2 class="titulos-grafico">Consumo</h2>
-            <canvas baseChart [datasets]="ChartConsuData" [labels]="ChartConsuLabels" [chartType]="ChartConsuType"></canvas>
+            <canvas baseChart [datasets]="ChartConsuData" [labels]="ChartConsuLabels" [options]="ChartConsuOptions"
+                [chartType]="ChartConsuType"></canvas>
+        </div>
+    </div>
+    <br>
+    <div nz-row>
+        <div nz-col nzSpan="11">
+            <nz-table #generacionTable nzBordered nzTitle="Detalle Generacion" [nzData]="dataGeneracion" nzSize="small"
+                [nzFrontPagination]="false">
+                <thead>
+                    <tr>
+                        <th>Medicion</th>
+                        <th>Lectura Inicial (kWh)</th>
+                        <th>Lectura Final (kWh)</th>
+                        <th>Generacion (kWh)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of generacionTable.data">
+                        <td>{{ data.medidor }}</td>
+                        <td nzAlign="right">{{ data.FF | number:'1.0':'en_US'}}</td>
+                        <td nzAlign="right">{{ data.FI | number:'1.0':'en_US'}}</td>
+                        <td nzAlign="right">{{ data.Consumo | number:'1.0':'en_US'}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">Total (kWh)</th>
+                        <th nzAlign="right">{{generacion | number:'1.0':'en_US'}}</th>
+                    </tr>
+                </tfoot>
+            </nz-table>
+        </div>
+        <div nz-col nzSpan="1"></div>
+        <div nz-col nzSpan="11">
+            <nz-table #consumoTable nzBordered nzTitle="Detalle Consumo" [nzData]="dataConsumo" nzSize="small"
+                [nzFrontPagination]="false">
+                <thead>
+                    <tr>
+                        <th>Medicion</th>
+                        <th>Lectura Inicial (kWh)</th>
+                        <th>Lectura Final (kWh)</th>
+                        <th>Consumo (kWh)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of consumoTable.data">
+                        <td>{{ data.medidor }}</td>
+                        <td nzAlign="right">{{ data.FF | number:'1.0':'en_US'}}</td>
+                        <td nzAlign="right">{{ data.FI | number:'1.0':'en_US'}}</td>
+                        <td nzAlign="right">{{ data.Consumo | number:'1.0':'en_US'}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">Total (kWh)</th>
+                        <th nzAlign="right">{{consumo | number:'1.0':'en_US'}}</th>
+                    </tr>
+                </tfoot>
+            </nz-table>
         </div>
     </div>
 </div>
@@ -66,6 +142,7 @@
     <p style="font-family: 'Roboto', sans-serif; font-size: 40px; color: #8a8a8a;">Dasboard</p>
 </div>
 
-<ngx-spinner bdColor="rgba(187,218,255,0.8)" size="medium" color="#0061aa" type="triangle-skew-spin" [fullScreen]="true">
+<ngx-spinner bdColor="rgba(187,218,255,0.8)" size="medium" color="#0061aa" type="triangle-skew-spin"
+    [fullScreen]="true">
     <p style="color: white"> Preparando... </p>
 </ngx-spinner>

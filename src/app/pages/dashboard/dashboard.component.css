@@ -1,6 +1,6 @@
 .container-valores {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr;
     gap: 5px 10px;
     grid-template-areas: ". . . .";
@@ -19,7 +19,7 @@
 
 .container-graficos {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr;
     gap: 5px 10px;
     grid-template-areas: ". .";

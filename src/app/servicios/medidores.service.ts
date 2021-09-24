@@ -36,7 +36,7 @@ export class MedidorService {
     }
 
     getMedidorEntidad() {
-        return this.http.get(`${apiUrl}v-medidor-entidad-variables?filter={"where":{"entidadId":{"inq":[8,4,5]}}}`);
+        return this.http.get(`${apiUrl}v-medidor-entidad-variables`);
     }
 
 

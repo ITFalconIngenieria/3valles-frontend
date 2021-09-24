@@ -11,8 +11,13 @@ export class FacturaService {
 
   constructor(private http: HttpClient) { }
 
-  getDetalle() {
-      return this.http.get(`${apiUrl}factura-datos/65?fechai=2021-07-01T00%3A00%3A00.000Z&fechaf=2021-08-01T00%3A00%3A00.000Z`)
+  getDetalle(fechai:string,fechaf:string,medidor:number) {
+      return this.http.get(`${apiUrl}factura-datos/${medidor}?fechai=${fechai}&fechaf=${fechaf}`)
+  }
+
+  getResumen(fechai:string,fechaf:string){
+      return this.http.get(`${apiUrl}resumen-datos?fechai=${fechai}&fechaf=${fechaf}`)
+ //  return this.http.get(`${apiUrl}resumen-datos?fechai=20210201&fechaf=20210301`)
   }
 
 }

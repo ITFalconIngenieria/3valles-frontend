@@ -3,6 +3,8 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { NgxSpinnerService } from 'ngx-spinner';
 import * as moment from 'moment';
+import { FacturaService } from 'src/app/servicios/factura.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,135 +15,181 @@ export class DashboardComponent implements OnInit {
   @ViewChild('content', { static: true }) content!: ElementRef;
 
   visible: boolean = false;
+  visibleFecha: boolean = false;
   tiempo: any;
+  fecha: any;
   fecha1: any = new Date();
   fecha2: any = new Date();
+  ventaEnee: number = 0;
+  compraEnee: number = 0;
+  generacion: number = 0;
+  perdida: number = 0;
+  consumo: number = 0;
+  dataGeneracion: any[] = [];
+  dataConsumo: any[] = [];
+
   ChartGenetOptions: any;
   ChartGenetLabels: any[] = [];
   ChartGenetType: any;
   ChartGenetLegend: any;
   ChartGenetData: any[] = [];
+  backgroundColor = ["#4FC3F7", "#E57373", "#FFF176", "#CE93D8", "#F06292", "#FFAB91", "#18FFFF", "#AED581", "#80CBC4", "#81F7F3", "#F79F81", "#F781F3", "#F2F5A9", "#DC90A3", "#EF517B", "#04B4AE", "#BDBDBD", "#FA8258", "#F5A9D0", "#FCCBC", "#FFE0B2", "#CFD8DC", "#FFD180", "#BCAAA4", "#EEEEEE", "#82B1FF", "#B2FF59", "#FF4081", "#C5CAE9", "#EEFF41"]
+  //borderColor = ["#0D47A1" , "#D50000" , "#FFFF00" , "#76FF03" , "#FF3D00" , "#AB47BC" , "#00E676"]
 
+  ChartConsuOptions: any;
   ChartConsuLabels: any[] = [];
   ChartConsuData: any[] = [];
   ChartConsuType: any;
 
   constructor(
-    private spinner: NgxSpinnerService
-
+    private spinner: NgxSpinnerService,
+    private serviceFactura: FacturaService,
+    private nzMessageService: NzMessageService,
   ) { }
 
   ngOnInit() {
-
-
-    this.ChartGenetOptions = {
-      scaleShowVerticalLines: true,
-        responsive: true,
-    };
-
-    this.ChartGenetLabels = [
-      'Generador 1',
-      'Generador 2',
-      'Generador 3',
-      'Generador 4',
-    ];
-    this.ChartGenetType = 'polarArea';
-    this.ChartGenetLegend = true;
-    this.ChartGenetData = [
-      {
-        data: [11, 16, 12, 10],
-        backgroundColor: ['#ffe1b9', '#76eabdab', '#76d7eaab', '#fbb2b2'],
-        borderColor: ['#ffb553','#40c793','#008aa5ab','#ec4a4a']
-      }
-    ];
-
-
-    //// Grafico Consumo
-    this.ChartConsuLabels = ['Sales Q1', 'Sales Q2', 'Sales Q3', 'Sales Q4'];
-    this.ChartConsuData =  [
-      {
-        data: [11, 13, 8, 5],
-        backgroundColor: ['#035eaf4d', '#ff00004d', '#ff94004d', '#008e154d'],
-        borderColor: ['#024d90','#b30202b2','#ff9400','#005a0d']
-      }
-    ];
-    this.ChartConsuType = 'doughnut';
   }
 
   mostrar() {
-    this.visible = true;
-
+    this.fecha1 = undefined;
+    this.fecha2 = undefined;
+    this.visible = false;
     switch (this.tiempo) {
       case '1': {
-        console.log(moment().startOf('day').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().startOf('day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
-
         break;
       }
       case '2': {
-        console.log(moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm'), moment().add(-1, 'day').endOf('day').format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment().add(-1, 'day').endOf('day').format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment().add(-1, 'day').endOf('day').add(1, 'm').format('YYYY-MM-DD HH:mm');
 
         break;
       }
       case '3': {
-        console.log(moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm')
         break;
       }
       case '4': {
-        console.log(moment(moment().startOf('week')).add(1, 'day').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
         break;
       }
       case '5': {
-        console.log(moment().startOf('year').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().startOf('year').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
         break;
       }
       case '6': {
-        console.log(moment(moment().startOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm')
-        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm')
+        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').add(1, 'm').format('YYYY-MM-DD HH:mm')
         break;
       }
       case '7': {
-        console.log(moment(moment().startOf('week').subtract(2, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment(moment().startOf('week').subtract(2, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').add(1, 'm').format('YYYY-MM-DD HH:mm');
         break;
       }
       case '8': {
-        console.log(moment().startOf('month').format('YYYY-MM-DD HH:mm'), moment().format('YYYY-MM-DD HH:mm'));
         this.fecha1 = moment().startOf('month').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
         break;
       }
       case '9': {
-        console.log(moment(moment().startOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm'));
-        this.fecha1 = moment(moment().startOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment(moment().endOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm');
+        this.fecha1 = moment(moment().add(-1, 'M').startOf('month')).format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment(moment().add(-1, 'M').endOf('month')).add(1, 'm').format('YYYY-MM-DD HH:mm');
         break;
       }
       case '10': {
-        console.log(moment(moment().startOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm'));
-        console.log(moment(moment().endOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm'));
-        this.fecha1 = moment(moment().startOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment(moment().endOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm');
+        this.fecha1 = moment(moment().add(-1, 'y').startOf('year')).format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment(moment().add(-1, 'y').endOf('year')).add(1, 'm').format('YYYY-MM-DD HH:mm');
+        break;
+      }
+      case '11': {
+        if (this.fecha != undefined && this.fecha.length>0 ) {
+          this.fecha1 = moment(this.fecha[0]).format('YYYY-MM-DD HH:mm');
+          this.fecha2 = moment(this.fecha[1]).format('YYYY-MM-DD HH:mm');
+        }
         break;
       }
       default:
         break;
     }
 
+    if (this.fecha1 === undefined && this.fecha2 === undefined) {
+      this.nzMessageService.warning('No se puede mostrar el reporte, revise las fechas seleccionadas y seleccione un rango de tiempo correcto.');
+    }
+    else {
+      this.serviceFactura.getResumen(this.fecha1, this.fecha2)
+        .toPromise()
+        .then((datos: any) => {
+          this.ventaEnee = datos.detalleConsumo.filter((item) => item.id == 1012)[0].Consumo;
+          this.compraEnee = datos.detalleGeneracion.filter((item) => item.tipoEntidad === true).map((item) => item.Consumo).reduce((a, b) => a + b)
+
+          this.generacion = datos.totalGeneracion - this.compraEnee;
+          this.consumo = datos.totalConsumo - this.ventaEnee;
+          this.perdida = datos.totalGeneracion - datos.totalConsumo;
+
+          this.dataGeneracion = datos.detalleGeneracion.filter((item) => item.tipoEntidad === false);
+          this.dataConsumo = datos.detalleConsumo.filter((item) => item.tipoEntidad === false);
+
+          this.ChartGenetOptions = {
+            scaleShowVerticalLines: true,
+            responsive: true,
+            tooltips: {
+              enabled: true,
+              callbacks: {
+                label: function (t, d) {
+                  return d.labels[t.index] + ': ' + d.datasets[0].data[t.index].toLocaleString('en-US') + ' kWh';
+                },
+              },
+            },
+            scale: {
+                ticks: {
+                  callback: value => value.toLocaleString('en-US') + ' kWh'
+                }
+            }
+          };
+
+          this.ChartGenetLabels = datos.detalleGeneracion.filter((item) => item.tipoEntidad === false).map((item) => item.medidor);
+
+          this.ChartGenetType = 'polarArea';
+          this.ChartGenetLegend = true;
+          this.ChartGenetData = [
+            {
+              data: datos.detalleGeneracion.filter((item) => item.tipoEntidad === false).map((item) => item.Consumo),
+              backgroundColor: this.backgroundColor,
+              borderColor: this.backgroundColor
+            }
+          ];
+
+          //// Grafico Consumo
+          this.ChartConsuOptions = {
+            responsive: true,
+            tooltips: {
+              callbacks: {
+                label: function (t, d) {
+                  return d.labels[t.index] + ': ' + d.datasets[0].data[t.index].toLocaleString('en-US') + ' kWh';
+                },
+              },
+            }
+          };
+          this.ChartConsuLabels = datos.detalleConsumo.filter((item) => item.tipoEntidad === false).map((item) => item.medidor);
+          this.ChartConsuData = [
+            {
+              data: datos.detalleConsumo.filter((item) => item.tipoEntidad === false).map((item) => item.Consumo),
+              backgroundColor: this.backgroundColor,
+            }
+          ];
+          this.ChartConsuType = 'doughnut';
+        })
+      this.visible = true;
+    }
+  }
+
+  changeRango(index) {
+    this.visibleFecha = index === '11' ? true : false;
   }
 
   imprimir(): void {
@@ -153,13 +201,13 @@ export class DashboardComponent implements OnInit {
       scale: 3
     };
 
-    const doc = new jsPDF('l', 'mm', 'letter', true);
+    const doc = new jsPDF('p', 'mm', 'letter', true);
 
     html2canvas(div, options).then((canvas) => {
       const img = canvas.toDataURL('image/PNG');
       // Add image Canvas to PDF
       const bufferX = 5;
-      const bufferY = 10;
+      const bufferY = 5;
       const imgProps = (<any>doc).getImageProperties(img);
       const pdfWidth = doc.internal.pageSize.getWidth() - 2 * bufferX;
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;

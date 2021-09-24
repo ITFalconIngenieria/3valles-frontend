@@ -16,6 +16,8 @@ export class FacturaComponent implements OnInit {
   @ViewChild('content', { static: true }) content!: ElementRef;
 
   visible: boolean = false;
+  visibleFecha: boolean = false;
+  fecha:any;
   cliente: any;
   medidor: any;
   tiempo: any;
@@ -39,12 +41,9 @@ export class FacturaComponent implements OnInit {
     private serviceEntidad: EntidadService,
     private serviceMedidor: MedidorService,
     private serviceFactura: FacturaService
-  ) {
-
-  }
+  ) {}
 
   ngOnInit() {
-
     this.dataFactura = '';
     this.serviceEntidad.getEntidadFilter()
       .toPromise()
@@ -57,27 +56,39 @@ export class FacturaComponent implements OnInit {
 
     this.barChartOptions = {
       scaleShowVerticalLines: false,
-      responsive: true
+      responsive: true,
+      tooltips: {
+        callbacks: {
+          label: t => t.yLabel.toLocaleString('en-US') + ' kWh'
+        }
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            // Create scientific notation labels
+            callback: value => value.toLocaleString('en-US') + ' kWh'
+          }
+        }]
+      }
     };
-
     this.barChartType = 'bar';
     this.barChartLegend = true;
-
   }
 
   mostrar() {
     this.visible = true;
+    this.fecha1 = undefined;
+    this.fecha2 = undefined;
     let data: any[] = [];
     switch (this.tiempo) {
       case '1': {
         this.fecha1 = moment().startOf('day').format('YYYY-MM-DD HH:mm');
         this.fecha2 = moment().format('YYYY-MM-DD HH:mm');
-
         break;
       }
       case '2': {
         this.fecha1 = moment().add(-1, 'day').startOf('day').format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment().add(-1, 'day').endOf('day').format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment().add(-1, 'day').endOf('day').add(1, 'm').format('YYYY-MM-DD HH:mm');
 
         break;
       }
@@ -98,12 +109,12 @@ export class FacturaComponent implements OnInit {
       }
       case '6': {
         this.fecha1 = moment(moment().startOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm')
-        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm')
+        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').add(1, 'm').format('YYYY-MM-DD HH:mm')
         break;
       }
       case '7': {
         this.fecha1 = moment(moment().startOf('week').subtract(2, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment(moment().endOf('week').subtract(1, 'week')).add(1, 'day').add(1, 'm').format('YYYY-MM-DD HH:mm');
         break;
       }
       case '8': {
@@ -112,39 +123,33 @@ export class FacturaComponent implements OnInit {
         break;
       }
       case '9': {
-        this.fecha1 = moment(moment().startOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment(moment().endOf('month').subtract(1, 'month')).format('YYYY-MM-DD HH:mm');
+        this.fecha1 = moment(moment().add(-1, 'M').startOf('month')).format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment(moment().add(-1, 'M').endOf('month')).add(1, 'm').format('YYYY-MM-DD HH:mm');
         break;
       }
       case '10': {
-        this.fecha1 = moment(moment().startOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm');
-        this.fecha2 = moment(moment().endOf('year').subtract(1, 'year')).format('YYYY-MM-DD HH:mm');
+        this.fecha1 = moment(moment().add(-1, 'y').startOf('year')).format('YYYY-MM-DD HH:mm');
+        this.fecha2 = moment(moment().add(-1, 'y').endOf('year')).add(1, 'm').format('YYYY-MM-DD HH:mm');
+        break;
+      }
+      case '11': {
+        if (this.fecha != undefined && this.fecha.length>0 ) {
+          this.fecha1 = moment(this.fecha[0]).format('YYYY-MM-DD HH:mm');
+          this.fecha2 = moment(this.fecha[1]).format('YYYY-MM-DD HH:mm');
+        }
         break;
       }
       default:
         break;
     }
 
-    this.serviceFactura.getDetalle()
+    this.serviceFactura.getDetalle(this.fecha1, this.fecha2, this.medidor.id)
       .toPromise()
       .then((datos: any) => {
-        this.dataFactura = datos[0];
-
-        [...this.dataFactura.detallePerdidas].forEach(element => {
-          // tslint:disable-next-line: forin
-          for (const key in element) {
-            this.detallePerdidas = [...this.detallePerdidas, element[key]];
-          }
-        });
-
-
-        [...this.dataFactura.consumoHistorico].forEach(index => {
-          // tslint:disable-next-line: forin
-          for (const key in index) {
-            this.barChartLabels = [...this.barChartLabels, moment(key).format('YYYY-MM-DD')];
-            data = [...data, index[key]];
-          }
-        });
+        this.dataFactura = datos;
+        this.detallePerdidas = this.dataFactura.detallePerdidas;
+        this.barChartLabels = this.dataFactura.consumoHistorico.map((item) => item.label);
+        data = this.dataFactura.consumoHistorico.map((item) => item.valor);
 
         this.barChartData = [
           {
@@ -152,15 +157,16 @@ export class FacturaComponent implements OnInit {
             backgroundColor: '#043f79',
           }
         ];
-        console.log(this.detallePerdidas);
-
-
       });
 
   }
 
-  changeEntidad(id) {
-    this.listOfMedidorFiltrado = this.listOfMedidor.filter(x => x.entidadId === id);
+  changeEntidad(entidad) {
+    this.listOfMedidorFiltrado = this.listOfMedidor.filter(x => x.entidadId === entidad.id);
+    this.medidor='';
+  }
+  changeRango(index) {
+    this.visibleFecha = index === '11' ? true : false;
   }
 
   imprimir(): void {
