@@ -15,9 +15,13 @@ export class MedidorComponent implements OnInit {
   isVisible = false;
   isVisibleRollover = false;
   isVisibleVariable = false;
+  isVisibleData = false;
+  isVisibleQuantity=false;
+  isVisibleTipo=false;
   validateForm: FormGroup;
   validateFormRollover: FormGroup;
   validateFormVariable: FormGroup;
+  validateFormData: FormGroup;
   searchValue = '';
   visible = false;
   accion: string;
@@ -36,8 +40,8 @@ export class MedidorComponent implements OnInit {
   listOfPME2: any[] = [];
   listOfVariable: variableModel[] = [];
   listOfVariablePME: variableModel[] = [];
- // listOfDataRollover: RolloverModel[] = [];
   listOfDataRolloverMedidor: RolloverModel[] = [];
+  listOfDatosManuales: any []=[];
 
   listOfColumns: ColumnItem[] = [
     {
@@ -124,22 +128,16 @@ export class MedidorComponent implements OnInit {
         console.log(error);
       }
     );
-    /*
-        this.medidorService.getRollover().toPromise().then(
-          (data: RolloverModel[]) => this.listOfDataRollover = data,
-          (error) => {
-            this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
-            console.log(error);
-          }
-        );
-    */
+
     this.limpiar();
     this.limpiarRollover();
     this.limpiarVariables();
+    this.limpiarData();
   }
 
   showModal(): void {
     this.isVisible = true;
+    this.isVisibleTipo=true;
   }
 
   handleCancel(): void {
@@ -210,6 +208,7 @@ export class MedidorComponent implements OnInit {
   }
 
   editar(data): void {
+    this.isVisibleTipo=data.tipo;
     this.accion = 'editar';
     this.isVisible = true;
     this.medidorEdit = data.id;
@@ -249,6 +248,10 @@ export class MedidorComponent implements OnInit {
       observacion: [''],
       tipo: ['true']
     });
+  }
+
+  changeTipo(index) {
+    this.isVisibleTipo = index ==="true"? true : false;
   }
 
   //ROLLOVER
@@ -398,7 +401,8 @@ export class MedidorComponent implements OnInit {
     showModalVariable(data): void {
       this.isVisibleVariable = true;
       this.idMedidor = data.id;
-
+      this.isVisibleQuantity = data.tipo;
+     
       this.medidorService.getVariable().toPromise().then(
         (data: variableModel[]) => {
           this.listOfVariable = data;
@@ -452,7 +456,7 @@ export class MedidorComponent implements OnInit {
       const dataVariable ={
         medidorId: this.idMedidor,
         variableId: this.validateFormVariable.value.variableId,
-        quantityId: this.validateFormVariable.value.quantityId,
+        quantityId: this.isVisibleQuantity === true ? this.validateFormVariable.value.quantityId:0,
         estado: true
       }
 
@@ -530,5 +534,89 @@ export class MedidorComponent implements OnInit {
         this.validateFormVariable.controls[i].markAsDirty();
         this.validateFormVariable.controls[i].updateValueAndValidity();
       }
+    }
+
+    //DATA
+    limpiarData() {
+      this.validateFormData = this.fb.group({
+        variableMedidorId: [null, [Validators.required]],
+        fecha: [null, [Validators.required]],
+        lectura: [null, [Validators.required]]
+      });
+    }
+
+    submitFormData(): void {
+      for (const i in this.validateFormData.controls) {
+        this.validateFormData.controls[i].markAsDirty();
+        this.validateFormData.controls[i].updateValueAndValidity();
+      }
+    }
+
+    showModalData(data): void {
+      this.isVisibleData = true;
+      this.idMedidor = data.id;
+
+      this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
+        (data: variableModel[]) => {
+          this.listOfVariable = data;
+        },
+        (error) => {
+          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          console.log(error);
+        }
+      );
+ /*     this.idMedidor = data.id;
+
+      this.medidorService.getVariable().toPromise().then(
+        (data: variableModel[]) => {
+          this.listOfVariable = data;
+        },
+        (error) => {
+          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          console.log(error);
+        }
+      );
+
+      this.medidorService.getVariablePME().toPromise().then(
+        (data: variableModel[]) => {
+          this.listOfVariablePME = data;
+        },
+        (error) => {
+          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          console.log(error);
+        }
+      );
+
+      this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
+        (data: variableModel[]) => {
+          this.listOfPME2 = data;
+        },
+        (error) => {
+          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          console.log(error);
+        }
+      );*/
+    }
+
+    handleCancelData(): void {
+      this.accion = 'new';
+      this.isVisibleData = false;
+      this.limpiarData();
+    }
+
+    handleOkData(): void {
+      this.limpiarData()
+      this.isVisibleData = false;
+    }
+
+    guardarData() {
+      const myFormattedDate = this.pipe.transform(this.validateFormData.value.fecha, 'yyyy-MM-dd HH:mm', '-1200');
+      const dataManual ={
+        variableId: this.validateFormData.value.variableMedidorId,
+        fecha: (new Date(myFormattedDate)).toISOString(),
+        lectura: this.validateFormData.value.lectura,
+        estado: true
+      }
+      console.log(dataManual)
     }
 }

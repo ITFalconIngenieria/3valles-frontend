@@ -117,7 +117,7 @@ export class DashboardComponent implements OnInit {
         break;
     }
 
-    if (this.fecha1 === undefined && this.fecha2 === undefined) {
+    if (this.fecha1 === undefined || this.fecha2 === undefined) {
       this.nzMessageService.warning('No se puede mostrar el reporte, revise las fechas seleccionadas y seleccione un rango de tiempo correcto.');
     }
     else {

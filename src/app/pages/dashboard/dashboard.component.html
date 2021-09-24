@@ -1,4 +1,4 @@
-<div class="container-graficos">
+<div class="container-parametros">
     <nz-input-group nzAddOnBefore="Rango de Tiempo" nzSize="small">
         <nz-select (ngModelChange)="changeRango($event)" nzSize="small" [(ngModel)]="tiempo">
             <nz-option-group nzLabel="Especificar Fecha">
@@ -35,7 +35,6 @@
             Imprimir
         </button>
     </div>
-
 </div>
 <br>
 <div id="content" *ngIf="visible">

@@ -36,7 +36,8 @@
                         <td nzWidth="30px">
                             <button nz-button nzType="primary" nz-popconfirm
                                 nzPopconfirmTitle="¿Está seguro de borrar el registro?" nzPopconfirmPlacement="bottom"
-                                (nzOnConfirm)="eliminar(data)" (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si">
+                                (nzOnConfirm)="eliminar(data)" (nzOnCancel)="cancel()" nzShape="circle"
+                                nzCancelText="No" nzOkText="Si">
                                 <i nz-icon nzType="delete" nzTheme="outline"></i>
                             </button>
                         </td>
@@ -52,10 +53,17 @@
                             <ng-template #estadoFalse><i nz-icon nzType="close-circle" nzTheme="twotone"></i>
                             </ng-template>
                         </td>
-                        <td nzWidth="30px">
-                            <button nz-button nzType="primary" nzSize="small" (click)="showModalRollover(data)"
-                                nzShape="round">Rollover</button>
-                            <button nz-button nzType="primary" nzGhost nzSize="small" (click)="showModalVariable(data)" nzShape="round">Variable</button>
+                        <td nzWidth="60px">
+                            <p><button nz-button nzType="primary" nzSize="small" (click)="showModalRollover(data)"
+                                    nzShape="round">Rollover</button>
+                                <button nz-button nzType="primary" nzGhost nzSize="small"
+                                    (click)="showModalVariable(data)" nzShape="round">Variable</button>
+                            </p>
+                            <p> <button *ngIf="!data.tipo" nz-button nzType="primary" Ghost nzSize="small"
+                                    nzShape="round" (click)="showModalData(data)"><i nz-icon nzType="number"
+                                        nzTheme="outline"></i> Ingreso de
+                                    Lecturas</button>
+                            </p>
                         </td>
                     </tr>
                 </tbody>
@@ -73,7 +81,7 @@
                     <nz-form-item>
                         <nz-form-label>Tipo de Medidor</nz-form-label>
                         <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
-                            <nz-radio-group formControlName="tipo">
+                            <nz-radio-group formControlName="tipo" (ngModelChange)="changeTipo($event)">
                                 <label nz-radio nzValue="true">Automatizado PME</label>
                                 <label nz-radio nzValue="false">Mediciones Manuales</label>
                             </nz-radio-group>
@@ -82,7 +90,7 @@
                 </div>
                 <div nz-col nzSpan="2"></div>
                 <div nz-col nzSpan="11">
-                    <nz-form-item>
+                    <nz-form-item *ngIf="isVisibleTipo">
                         <nz-form-label>Codigo Medidor</nz-form-label>
                         <nz-form-control>
                             <nz-select formControlName="sourceId" placeholder="Seleccione una..." nzShowSearch
@@ -142,7 +150,7 @@
     (nzOnCancel)="handleCancelRollover()">
     <ng-container *nzModalContent>
         <form nz-form nzLayout="vertical" (ngSubmit)="submitFormRollover()" [formGroup]="validateFormRollover">
-          <!--  <h5> Configuración del Rollover </h5>-->
+            <!--  <h5> Configuración del Rollover </h5>-->
             <nz-form-item>
                 <nz-form-label>Código del medidor</nz-form-label>
                 <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
@@ -155,7 +163,7 @@
                     <nz-form-item>
                         <nz-form-label>Fecha de Rollover</nz-form-label>
                         <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
-                            <nz-date-picker [nzShowTime]="{ nzFormat: 'HH:mm' }"  formControlName="fecha"
+                            <nz-date-picker [nzShowTime]="{ nzFormat: 'HH:mm' }" formControlName="fecha"
                                 nzFormat="yyyy-MM-dd HH:mm"></nz-date-picker>
                         </nz-form-control>
                     </nz-form-item>
@@ -167,8 +175,9 @@
                         <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
                             <nz-select formControlName="variableMedidorId" placeholder="Seleccione una..." nzShowSearch
                                 nzAllowClear>
-                                <nz-option *ngFor="let variable of listOfVariable" [nzValue]="variable.variableMedidorId"
-                                    [nzLabel]="variable.name">
+                                <nz-option *ngFor="let variable of listOfVariable"
+                                    [nzValue]="variable.variableMedidorId"
+                                    [nzLabel]="variable.name || variable.descripcion">
                                 </nz-option>
                             </nz-select>
                         </nz-form-control>
@@ -255,8 +264,9 @@
                             </td>
                             <td>
                                 <button nz-button nzType="primary" nz-popconfirm
-                                nzPopconfirmTitle="¿Está seguro de borrar el registro?" nzPopconfirmPlacement="bottom" 
-                                (nzOnConfirm)="eliminarRollover(data)" (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si"> 
+                                    nzPopconfirmTitle="¿Está seguro de borrar el registro?"
+                                    nzPopconfirmPlacement="bottom" (nzOnConfirm)="eliminarRollover(data)"
+                                    (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si">
                                     <i nz-icon nzType="delete" nzTheme="outline"></i>
                                 </button>
                             </td>
@@ -283,19 +293,17 @@
             <nz-form-item>
                 <nz-form-label>Variable Energetica</nz-form-label>
                 <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
-                    <nz-select formControlName="variableId" placeholder="Seleccione una..." nzShowSearch
-                        nzAllowClear>
+                    <nz-select formControlName="variableId" placeholder="Seleccione una..." nzShowSearch nzAllowClear>
                         <nz-option *ngFor="let variable of listOfVariable" [nzValue]="variable.id"
                             [nzLabel]="variable.descripcion">
                         </nz-option>
                     </nz-select>
                 </nz-form-control>
             </nz-form-item>
-            <nz-form-item>
+            <nz-form-item *ngIf="isVisibleQuantity">
                 <nz-form-label>Referencia en PME</nz-form-label>
                 <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
-                    <nz-select formControlName="quantityId" placeholder="Seleccione una..." nzShowSearch
-                        nzAllowClear>
+                    <nz-select formControlName="quantityId" placeholder="Seleccione una..." nzShowSearch nzAllowClear>
                         <nz-option *ngFor="let variable of listOfVariablePME" [nzValue]="variable.id"
                             [nzLabel]="variable.descripcion">
                         </nz-option>
@@ -321,11 +329,11 @@
         <br>
         <div style="background-color: #f3f9ff; padding: 15px;">
             <h4> Listado de Variables </h4>
-           <nz-table #nzTableRollover [nzData]="listOfPME2" nzTableLayout="fixed" nzPageSize="4">
+            <nz-table #nzTableRollover [nzData]="listOfPME2" nzTableLayout="fixed" nzPageSize="4">
                 <thead>
                     <tr>
                         <th>Variable Energetica</th>
-                        <th>Referencia en PME</th>
+                        <th *ngIf="isVisibleQuantity">Referencia en PME</th>
                         <th nzWidth="10%"></th>
                         <th nzWidth="10%"></th>
                     </tr>
@@ -334,7 +342,7 @@
                     <ng-container *ngFor="let data of nzTableRollover.data">
                         <tr>
                             <td>{{ data.variableId + ' - ' + data.descripcion}}</td>
-                            <td>{{ data.quantityId + ' - ' + data.name}}</td>
+                            <td *ngIf="isVisibleQuantity">{{ data.quantityId + ' - ' + data.name}}</td>
                             <td>
                                 <button nz-button nzType="primary" (click)="editarVariables(data)" nzShape="circle">
                                     <i nz-icon nzType="edit" nzTheme="outline"></i>
@@ -342,8 +350,9 @@
                             </td>
                             <td>
                                 <button nz-button nzType="primary" nz-popconfirm
-                                nzPopconfirmTitle="¿Está seguro de borrar el registro?" nzPopconfirmPlacement="bottom" 
-                                (nzOnConfirm)="eliminarVariables(data)" (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si"> 
+                                    nzPopconfirmTitle="¿Está seguro de borrar el registro?"
+                                    nzPopconfirmPlacement="bottom" (nzOnConfirm)="eliminarVariables(data)"
+                                    (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si">
                                     <i nz-icon nzType="delete" nzTheme="outline"></i>
                                 </button>
                             </td>
@@ -355,6 +364,107 @@
     </ng-container>
     <div *nzModalFooter>
         <button nz-button nzType="primary" (click)="handleOkVariables()">OK</button>
+    </div>
+</nz-modal>
+
+<!-- Modal Data -->
+<nz-modal [(nzVisible)]="isVisibleData" nzTitle="Ingreso de Datos" nzWidth="40%" (nzOnCancel)="handleCancelData()">
+    <ng-container *nzModalContent>
+        <form nz-form nzLayout="vertical" (ngSubmit)="submitFormData()" [formGroup]="validateFormData">
+            <div nz-row>
+                <div nz-col nzSpan="8">
+                    <nz-form-item>
+                        <nz-form-label>Variable Energetica</nz-form-label>
+                        <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
+                            <nz-select formControlName="variableMedidorId" placeholder="Seleccione una..." nzShowSearch
+                                nzAllowClear>
+                                <nz-option *ngFor="let variable of listOfVariable"
+                                    [nzValue]="variable.variableMedidorId"
+                                    [nzLabel]="variable.name || variable.descripcion">
+                                </nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="1"></div>
+                <div nz-col nzSpan="7">
+                    <nz-form-item>
+                        <nz-form-label>Fecha</nz-form-label>
+                        <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
+                            <nz-date-picker [nzShowTime]="{ nzFormat: 'HH:mm' }" formControlName="fecha"
+                                nzFormat="yyyy-MM-dd HH:mm"></nz-date-picker>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col nzSpan="1"></div>
+                <div nz-col nzSpan="7">
+                    <nz-form-item>
+                        <nz-form-label>Lectura</nz-form-label>
+                        <nz-form-control nzErrorTip="Por favor escriba el dato correcto!">
+                            <div style="display: flex; justify-content: flex-start;">
+                                <nz-input-number formControlName="lectura" style="width: 100%; margin: 0px;"
+                                    [nzMin]="0" [nzStep]="1">
+                                </nz-input-number>
+                                <label style="color: black; font-size: 17px; margin-left: 2%;"> kW</label>
+                            </div>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+            <nz-form-item>
+                <nz-form-control>
+                    <div nz-row>
+                        <div nz-col nzSpan="11">
+                            <button nz-button style="width: 100%;" nzType="default"
+                                (click)="handleCancelData()">Cancelar</button>
+                        </div>
+                        <div nz-col nzSpan="2"></div>
+                        <div nz-col nzSpan="11">
+                            <button nz-button style="width: 100%;" nzType="primary" (click)="guardarData()"
+                                [disabled]="permiso">Guardar</button>
+                        </div>
+                    </div>
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+        <br>
+        <div style="background-color: #f3f9ff; padding: 15px;">
+            <h4> Lecturas Manuales</h4>
+            <nz-table #nzTableDatos [nzData]="listOfDatosManuales" nzTableLayout="fixed" nzPageSize="4">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Lectura</th>
+                        <th nzWidth="10%"></th>
+                        <th nzWidth="10%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let data of nzTableDatos.data">
+                        <tr>
+                            <td>{{data.fecha}}</td>
+                            <td>{{data.lectura}}</td>
+                            <td>
+                                <button nz-button nzType="primary" (click)="editarDatos(data)" nzShape="circle">
+                                    <i nz-icon nzType="edit" nzTheme="outline"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button nz-button nzType="primary" nz-popconfirm
+                                    nzPopconfirmTitle="¿Está seguro de borrar el registro?"
+                                    nzPopconfirmPlacement="bottom" (nzOnConfirm)="eliminarDatos(data)"
+                                    (nzOnCancel)="cancel()" nzShape="circle" nzCancelText="No" nzOkText="Si">
+                                    <i nz-icon nzType="delete" nzTheme="outline"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </nz-table>
+        </div>
+    </ng-container>
+    <div *nzModalFooter>
+        <button nz-button nzType="primary" (click)="handleOkData()">OK</button>
     </div>
 </nz-modal>
 

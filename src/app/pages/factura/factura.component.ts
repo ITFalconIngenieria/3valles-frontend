@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import { EntidadService } from 'src/app/servicios/entidad.service';
 import { MedidorService } from 'src/app/servicios/medidores.service';
 import { FacturaService } from './../../servicios/factura.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-factura',
@@ -17,7 +18,7 @@ export class FacturaComponent implements OnInit {
 
   visible: boolean = false;
   visibleFecha: boolean = false;
-  fecha:any;
+  fecha: any;
   cliente: any;
   medidor: any;
   tiempo: any;
@@ -40,8 +41,9 @@ export class FacturaComponent implements OnInit {
     private spinner: NgxSpinnerService,
     private serviceEntidad: EntidadService,
     private serviceMedidor: MedidorService,
-    private serviceFactura: FacturaService
-  ) {}
+    private serviceFactura: FacturaService,
+    private nzMessageService: NzMessageService
+  ) { }
 
   ngOnInit() {
     this.dataFactura = '';
@@ -76,7 +78,7 @@ export class FacturaComponent implements OnInit {
   }
 
   mostrar() {
-    this.visible = true;
+    this.visible = false;
     this.fecha1 = undefined;
     this.fecha2 = undefined;
     let data: any[] = [];
@@ -133,7 +135,7 @@ export class FacturaComponent implements OnInit {
         break;
       }
       case '11': {
-        if (this.fecha != undefined && this.fecha.length>0 ) {
+        if (this.fecha != undefined && this.fecha.length > 0) {
           this.fecha1 = moment(this.fecha[0]).format('YYYY-MM-DD HH:mm');
           this.fecha2 = moment(this.fecha[1]).format('YYYY-MM-DD HH:mm');
         }
@@ -142,28 +144,32 @@ export class FacturaComponent implements OnInit {
       default:
         break;
     }
+    if (this.medidor=== undefined || this.fecha1 === undefined || this.fecha2 === undefined) {
+      this.nzMessageService.warning('No se puede mostrar el reporte, revise el medidor y las fechas seleccionadas y seleccione los correctos.');
+    }
+    else {
+      this.serviceFactura.getDetalle(this.fecha1, this.fecha2, this.medidor.id)
+        .toPromise()
+        .then((datos: any) => {
+          this.dataFactura = datos;
+          this.detallePerdidas = this.dataFactura.detallePerdidas;
+          this.barChartLabels = this.dataFactura.consumoHistorico.map((item) => item.label);
+          data = this.dataFactura.consumoHistorico.map((item) => item.valor);
 
-    this.serviceFactura.getDetalle(this.fecha1, this.fecha2, this.medidor.id)
-      .toPromise()
-      .then((datos: any) => {
-        this.dataFactura = datos;
-        this.detallePerdidas = this.dataFactura.detallePerdidas;
-        this.barChartLabels = this.dataFactura.consumoHistorico.map((item) => item.label);
-        data = this.dataFactura.consumoHistorico.map((item) => item.valor);
-
-        this.barChartData = [
-          {
-            data, label: 'kW',
-            backgroundColor: '#043f79',
-          }
-        ];
-      });
-
+          this.barChartData = [
+            {
+              data, label: 'kW',
+              backgroundColor: '#043f79',
+            }
+          ];
+        });
+      this.visible = true;
+    }
   }
 
   changeEntidad(entidad) {
     this.listOfMedidorFiltrado = this.listOfMedidor.filter(x => x.entidadId === entidad.id);
-    this.medidor='';
+    this.medidor = undefined;
   }
   changeRango(index) {
     this.visibleFecha = index === '11' ? true : false;

@@ -99,4 +99,21 @@ export class MedidorService {
     postVariable(variable) {
         return this.http.post(`${apiUrl}variable-medidors`, variable);
     }
+
+    //Datos manuales
+    getDatos(variable){
+        return this.http.get(`${apiUrl}datos?filter[where][variableId]=${variable}`);
+    }
+
+    postDatos(data){
+        return this.http.post(`${apiUrl}datos`, data);
+    }
+
+    putDatos(id, data) {
+        return this.http.put(`${apiUrl}datos/${id}`, data);
+    }
+
+    deleteDatos(id, data) {
+        return this.http.patch(`${apiUrl}datos/${id}`, data);
+    }
 }
