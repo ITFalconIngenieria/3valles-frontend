@@ -1,13 +1,14 @@
 <div class="container-opciones">
-    <nz-input-group nzAddOnBefore="Cliente" nzSize="small">
-        <nz-select [(ngModel)]="cliente" nzSize="small" (ngModelChange)="changeEntidad($event)" nzPlaceHolder="Seleccione...">
-            <nz-option *ngFor="let entidad of listOfEntidad" [nzLabel]="entidad.codigo" [nzValue]="entidad">
+    <nz-input-group nzAddOnBefore="Grupo" nzSize="small">
+        <nz-select [(ngModel)]="centroCosto" nzSize="small" (ngModelChange)="changeCentroCosto($event)"
+            nzPlaceHolder="Seleccione...">
+            <nz-option *ngFor="let item of listOfCentroCosto" [nzLabel]="item.nombre" [nzValue]="item">
             </nz-option>
         </nz-select>
     </nz-input-group>
-    <nz-input-group nzAddOnBefore="Medidor" nzSize="small">
-        <nz-select [(ngModel)]="medidor" nzSize="small" nzPlaceHolder="Seleccione...">
-            <nz-option *ngFor="let medidor of listOfMedidorFiltrado" [nzLabel]="medidor.medidor + ' ' + medidor.name " [nzValue]="medidor"></nz-option>
+    <nz-input-group nzAddOnBefore="Centro de Costo" nzSize="small">
+        <nz-select [(ngModel)]="grupo" nzSize="small" nzPlaceHolder="Seleccione...">
+            <nz-option *ngFor="let item of listOfGrupoFiltrado" [nzLabel]="item.nombre" [nzValue]="item"></nz-option>
         </nz-select>
     </nz-input-group>
     <nz-input-group nzAddOnBefore="Rango de Tiempo" nzSize="small">
@@ -35,11 +36,13 @@
         <nz-range-picker nzSize="small" nzFormat="yyyy-MM-dd HH:mm" [(ngModel)]="fecha"></nz-range-picker>
     </nz-input-group>
     <div class="botones">
-        <button nz-button nzType="primary" nzSize="small" (click)="mostrar()" style=" background-color: #027519; border-color: #027519; ">
+        <button nz-button nzType="primary" nzSize="small" (click)="mostrar()"
+            style=" background-color: #027519; border-color: #027519; ">
             <i nz-icon nzType="search"></i>
             Mostrar
         </button>
-        <button nz-button nzType="primary" nzSize="small" (click)="imprimir()" style=" background-color: #c41a1a; border-color: #c41a1a; ">
+        <button nz-button nzType="primary" nzSize="small" (click)="imprimir()"
+            style=" background-color: #c41a1a; border-color: #c41a1a; ">
             <i nz-icon nzType="printer"></i>
             Imprimir
         </button>
@@ -65,7 +68,7 @@
 
             </div>
             <div>
-                <p> {{cliente.codigo}} </p>
+                <p> {{grupo.nombre}} </p>
                 <p> 00000 </p>
                 <p> 00000 </p>
             </div>
@@ -87,8 +90,8 @@
     <div class="titulo-separador">
         <p style="font-size: 20px; font-weight: bold;">Detalle de Consumo de Energia</p>
     </div>
-    <div class="container-lecturas">
-        <div class="div-valores">
+    <div>
+        <!--        <div class="div-valores">
             <p class="titulo-lecturas">Lectura Inicial (kWh)</p>
             <p class="valor"> {{ dataFactura.lecturaFinal | number:'1.0':'en_US'}} </p>
         </div>
@@ -109,50 +112,80 @@
             <p class="valor"> {{ dataFactura.total + dataFactura.perdidas | number:'1.0':'en_US'}} </p>
         </div>
     </div>
-    <br>
-    <div class="titulo-separador">
-        <p style="font-size: 15px; font-weight: bold;">Detalle Pérdidas</p>
-        <p style="font-size: 15px; font-weight: bold;">Consumo Energía Electrica</p>
-    </div>
-    <div class="container-detalle">
-        <div style="width: 100%; margin: auto;">
-            <table class="table table-sm table-striped">
+-->
+        <div>
+            <nz-table #consumoTable [nzData]="dataFactura" nzSize="small" nzBordered>
                 <thead>
                     <tr nzAlign="center">
-                        <th>Origen de la Energía</th>
-                        <th>Pérdida (kWh)</th>
+                        <th nzWidth="500px">Medidor</th>
+                        <th>Lectura Inicial (kWh)</th>
+                        <th>Lectura Final (kWh)</th>
+                        <th>Consumo (kWh)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let generador of detallePerdidas; let i = index">
-                        <td> {{generador.label}}</td>
-                        <td nzAlign="right"> {{ generador.valor | number:'1.0':'en_US'}} </td>
+                    <tr *ngFor="let item of consumoTable.data; let i = index">
+                        <td> {{item.descripcion}}</td>
+                        <td nzAlign="right"> {{ item.inicial | number:'1.1-1':'en_US'}} </td>
+                        <td nzAlign="right"> {{ item.final | number:'1.1-1':'en_US'}} </td>
+                        <td nzAlign="right"> {{ item.final - item.inicial | number:'1.1-1':'en_US'}} </td>
                     </tr>
 
                 </tbody>
                 <tfoot>
                     <tr style="background-color: #578f61b0; text-align: right; font-weight: bold;">
-                        <td>Total de Perdidas (kWh)</td>
-                        <td nzAlign="right"> {{ dataFactura.perdidas | number:'1.0':'en_US'}} </td>
+                        <td colspan="3">Total de Energia (kWh)</td>
+                        <td nzAlign="right"> {{ totalMedicion | number:'1.1-2':'en_US'}} </td>
                     </tr>
                 </tfoot>
-            </table>
+            </nz-table>
         </div>
-        <div>
-            <div style="height: 80%; width: 80%; margin: auto;">
-                <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType">
-                </canvas>
+        </div>
+        <br>
+        <div class="titulo-separador">
+            <p style="font-size: 15px; font-weight: bold;">Calculo Energia</p>
+            <p style="font-size: 15px; font-weight: bold;">Consumo Energía Electrica</p>
+        </div>
+        <div class="container-detalle">
+            <div style="width: 100%; margin: auto;" *ngIf="grupo">
+               <!-- <div class="div-valores">
+                    <p class="titulo-lecturas">Factor Grupo</p>
+                    <p class="valor"> {{ factores[0].factorC | number:'1.1-2':'en_US'}} </p>
+                </div>
+                <div class="div-valores">
+                    <p class="titulo-lecturas">Factor Centro de Costo</p>
+                    <p class="valor"> {{ factores[0].factorG | number:'1.1-2':'en_US'}} </p>
+                </div>
+                <div class="div-valores">
+                    <p class="titulo-lecturas">Formula</p>
+                    <p class="valor"> ( {{ factores[0].factorG | number:'1.1-2':'en_US'}} * ({{totalMedicion | number:'1.1-2':'en_US'}} / 3 ) ) / {{factores[0].factorC | number:'1.1-2':'en_US'}} </p>
+                </div>-->
+                <div class="div-valores">
+                    <p class="titulo-lecturas">Porcentaje de {{grupo.nombre}} en  {{centroCosto.nombre}}</p>
+                    <p class="valor"> {{ (factores[0].factorG/factores[0].factorC)*100 | number:'1.1-2':'en_US'}} %</p>
+                </div>
+                <div class="div-valores">
+                    <p class="titulo-lecturas">Total</p>
+                    <p class="valor"> {{ (factores[0].factorG * (totalMedicion/3)) /factores[0].factorC | number:'1.1-2':'en_US'}} kWh</p>
+                </div>
+            </div>
+            <div>
+                <div style="height: 80%; width: 80%; margin: auto;">
+                    <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions"
+                        [legend]="barChartLegend" [chartType]="barChartType">
+                    </canvas>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<div *ngIf="!visible" style="display: flex; flex-direction: column; align-items: center;">
-    <img style="width: 25%;" src="assets/logo.svg" alt="">
-    <p style="font-family: 'Roboto', sans-serif;font-size: 40px; color: #8a8a8a;">Factura</p>
-</div>
+    <div *ngIf="!visible" style="display: flex; flex-direction: column; align-items: center;">
+        <img style="width: 25%;" src="assets/logo.svg" alt="">
+        <p style="font-family: 'Roboto', sans-serif;font-size: 40px; color: #8a8a8a;">Factura</p>
+    </div>
 
-<ngx-spinner bdColor="rgba(187,218,255,0.8)" size="medium" color="#0061aa" type="triangle-skew-spin" [fullScreen]="true">
-    <p style="color: white"> Preparando... </p>
-</ngx-spinner>
+    <ngx-spinner bdColor="rgba(187,218,255,0.8)" size="medium" color="#0061aa" type="triangle-skew-spin"
+        [fullScreen]="true">
+        <p style="color: white"> Preparando... </p>
+    </ngx-spinner>

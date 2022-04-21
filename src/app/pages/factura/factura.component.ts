@@ -7,6 +7,8 @@ import { EntidadService } from 'src/app/servicios/entidad.service';
 import { MedidorService } from 'src/app/servicios/medidores.service';
 import { FacturaService } from './../../servicios/factura.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { centroCostoService } from 'src/app/servicios/centroCosto.service';
+import { grupoService } from 'src/app/servicios/grupo.service';
 
 @Component({
   selector: 'app-factura',
@@ -19,12 +21,18 @@ export class FacturaComponent implements OnInit {
   visible: boolean = false;
   visibleFecha: boolean = false;
   fecha: any;
-  cliente: any;
-  medidor: any;
+ // cliente: any;
+  centroCosto:any;
+//  medidor: any;
+  grupo:any;
   tiempo: any;
   listOfEntidad: any[] = [];
-  listOfMedidor: any[] = [];
-  listOfMedidorFiltrado: any[] = [];
+  listOfCentroCosto: any[] =[];
+  listOfGrupo:any[]=[];
+  listOfGrupoFiltrado:any[]=[];
+  factores:any;
+/*  listOfMedidor: any[] = [];
+  listOfMedidorFiltrado: any[] = [];*/
   fechaDia: any = new Date();
   fecha1: any = new Date();
   fecha2: any = new Date();
@@ -34,28 +42,40 @@ export class FacturaComponent implements OnInit {
   barChartLegend: any;
   barChartData: any[] = [];
   dataFactura: any;
+  totalMedicion:number;
   detallePerdidas: any[] = [];
   consumoHistorico: any[] = [];
 
   constructor(
     private spinner: NgxSpinnerService,
-    private serviceEntidad: EntidadService,
-    private serviceMedidor: MedidorService,
+/*    private serviceEntidad: EntidadService,
+    private serviceMedidor: MedidorService,*/
     private serviceFactura: FacturaService,
+    private serviceCentroCosto:centroCostoService,
+    private serviceGrupo:grupoService,
     private nzMessageService: NzMessageService
   ) { }
 
   ngOnInit() {
+    this.serviceCentroCosto.getCentroCosto()
+      .toPromise()
+      .then((data:any)=>{
+        this.listOfCentroCosto=data;
+        this.serviceGrupo.getGrupo()
+        .toPromise()
+        .then((data:any)=>this.listOfGrupo=data)
+      })
+
     this.dataFactura = '';
-    this.serviceEntidad.getEntidadFilter()
+/*    this.serviceEntidad.getEntidadFilter()
       .toPromise()
       .then((data: any) => {
         this.listOfEntidad = data;
         this.serviceMedidor.getMedidorEntidad()
           .toPromise()
-          .then((datos: any) => this.listOfMedidor = datos);
+          .then((datos: any) => this.listOfGrupo = datos);
       });
-
+*/
     this.barChartOptions = {
       scaleShowVerticalLines: false,
       responsive: true,
@@ -144,11 +164,11 @@ export class FacturaComponent implements OnInit {
       default:
         break;
     }
-    if (this.medidor=== undefined || this.fecha1 === undefined || this.fecha2 === undefined) {
+    if (this.centroCosto=== undefined || this.fecha1 === undefined || this.fecha2 === undefined) {
       this.nzMessageService.warning('No se puede mostrar el reporte, revise el medidor y las fechas seleccionadas y seleccione los correctos.');
     }
     else {
-      this.serviceFactura.getDetalle(this.fecha1, this.fecha2, this.medidor.id)
+/*      this.serviceFactura.getDetalle(this.fecha1, this.fecha2, this.medidor.id)
         .toPromise()
         .then((datos: any) => {
           this.dataFactura = datos;
@@ -162,14 +182,29 @@ export class FacturaComponent implements OnInit {
               backgroundColor: '#043f79',
             }
           ];
-        });
+        });*/
+      this.serviceFactura.getConsumoMedidores(this.centroCosto.id,this.fecha1,this.fecha2)
+      .toPromise()
+      .then((datos:any)=>{
+        this.dataFactura=datos
+        this.totalMedicion=0
+        this.dataFactura.map((data) => this.totalMedicion+=data.final-data.inicial)
+        console.log(this.totalMedicion)
+      })
+
+      this.serviceFactura.getFactores(this.centroCosto.id,this.grupo.id)
+      .toPromise()
+      .then((datos:any)=>{
+        this.factores=datos
+        console.log(this.factores)
+      })
       this.visible = true;
     }
   }
 
-  changeEntidad(entidad) {
-    this.listOfMedidorFiltrado = this.listOfMedidor.filter(x => x.entidadId === entidad.id);
-    this.medidor = undefined;
+  changeCentroCosto(centroCosto) {
+    this.listOfGrupoFiltrado = this.listOfGrupo.filter(x => x.centroCostoId === centroCosto.id);
+    this.grupo = undefined;
   }
   changeRango(index) {
     this.visibleFecha = index === '11' ? true : false;

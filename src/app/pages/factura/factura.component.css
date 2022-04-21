@@ -96,13 +96,13 @@ p {
     height: 100%;
     width: 100%;
 }
-
+/*
 th,
 td {
     width: 100%;
     font-size: 13px;
     padding: 0px 10px 0px 10px;
-}
+}*/
 
 th {
     background-color: #578f61b0;
