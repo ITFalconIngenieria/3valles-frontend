@@ -442,8 +442,8 @@
                 <tbody>
                     <ng-container *ngFor="let data of nzTableDatos.data">
                         <tr>
-                            <td>{{data.fecha}}</td>
-                            <td>{{data.lectura}}</td>
+                            <td>{{data.fecha | date:'yyyy-MM-dd':'+0600'}}</td>
+                            <td>{{data.lectura | number:'':'en_US'}}</td>
                             <td>
                                 <button nz-button nzType="primary" (click)="editarDatos(data)" nzShape="circle">
                                     <i nz-icon nzType="edit" nzTheme="outline"></i>

@@ -68,7 +68,7 @@
 
             </div>
             <div>
-                <p> {{grupo.nombre}} </p>
+                <div *ngIf="grupo; else labelCentro"><p>{{grupo.nombre}}</p></div>
                 <p> 00000 </p>
                 <p> 00000 </p>
             </div>
@@ -117,10 +117,16 @@
             <nz-table #consumoTable [nzData]="dataFactura" nzSize="small" nzBordered>
                 <thead>
                     <tr nzAlign="center">
-                        <th nzWidth="500px">Medidor</th>
-                        <th>Lectura Inicial (kWh)</th>
-                        <th>Lectura Final (kWh)</th>
-                        <th>Consumo (kWh)</th>
+                        <th nzWidth="500px" rowspan="2">Medidor</th>
+                        <th colspan="2">Lecturas</th>
+                        <th rowspan="2">Consumo (kWh)</th>
+                        <th colspan="2">Origen de la Energia</th>
+                    </tr>
+                    <tr nzAlign="center">
+                        <th>Inicial (kWh)</th>
+                        <th>Final (kWh)</th>
+                        <th>Porcentaje Generacion</th>
+                        <th>Porcentaje Red Publica</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -128,14 +134,17 @@
                         <td> {{item.descripcion}}</td>
                         <td nzAlign="right"> {{ item.inicial | number:'1.1-1':'en_US'}} </td>
                         <td nzAlign="right"> {{ item.final | number:'1.1-1':'en_US'}} </td>
-                        <td nzAlign="right"> {{ item.final - item.inicial | number:'1.1-1':'en_US'}} </td>
+                        <td nzAlign="right"> {{ (item.final - item.inicial)*item.operacion | number:'1.1-1':'en_US'}} </td>
+                        <td nzAlign="right"> {{ (item.final - item.inicial)*item.operacion*1 | number:'1.1-1':'en_US'}} </td>
+                        <td nzAlign="right"> {{ (item.final - item.inicial)*item.operacion*0 | number:'1.1-1':'en_US'}} </td>
                     </tr>
-
                 </tbody>
                 <tfoot>
                     <tr style="background-color: #578f61b0; text-align: right; font-weight: bold;">
                         <td colspan="3">Total de Energia (kWh)</td>
                         <td nzAlign="right"> {{ totalMedicion | number:'1.1-2':'en_US'}} </td>
+                        <td nzAlign="right"> {{ totalMedicion*1 | number:'1.1-2':'en_US'}} </td>
+                        <td nzAlign="right"> {{ totalMedicion*0 | number:'1.1-2':'en_US'}} </td>
                     </tr>
                 </tfoot>
             </nz-table>
@@ -147,28 +156,17 @@
             <p style="font-size: 15px; font-weight: bold;">Consumo Energía Electrica</p>
         </div>
         <div class="container-detalle">
-            <div style="width: 100%; margin: auto;" *ngIf="grupo">
-               <!-- <div class="div-valores">
-                    <p class="titulo-lecturas">Factor Grupo</p>
-                    <p class="valor"> {{ factores[0].factorC | number:'1.1-2':'en_US'}} </p>
-                </div>
+            <div style="width: 100%; margin: auto;" *ngIf="grupo; else sinGrupo">
                 <div class="div-valores">
-                    <p class="titulo-lecturas">Factor Centro de Costo</p>
-                    <p class="valor"> {{ factores[0].factorG | number:'1.1-2':'en_US'}} </p>
-                </div>
-                <div class="div-valores">
-                    <p class="titulo-lecturas">Formula</p>
-                    <p class="valor"> ( {{ factores[0].factorG | number:'1.1-2':'en_US'}} * ({{totalMedicion | number:'1.1-2':'en_US'}} / 3 ) ) / {{factores[0].factorC | number:'1.1-2':'en_US'}} </p>
-                </div>-->
-                <div class="div-valores">
-                    <p class="titulo-lecturas">Porcentaje de {{grupo.nombre}} en  {{centroCosto.nombre}}</p>
-                    <p class="valor"> {{ (factores[0].factorG/factores[0].factorC)*100 | number:'1.1-2':'en_US'}} %</p>
+                    <p class="titulo-lecturas">Porcentaje de {{centroCosto.nombre}} para {{grupo.nombre}}</p>
+                    <p class="valor"> {{factores[0].valor * 100 | number:'1.1-2':'en_US'}} %</p>
                 </div>
                 <div class="div-valores">
                     <p class="titulo-lecturas">Total</p>
-                    <p class="valor"> {{ (factores[0].factorG * (totalMedicion/3)) /factores[0].factorC | number:'1.1-2':'en_US'}} kWh</p>
+                    <p class="valor"> {{ factores[0].valor * (totalMedicion/3) | number:'1.1-2':'en_US'}} kWh</p>
                 </div>
             </div>
+
             <div>
                 <div style="height: 80%; width: 80%; margin: auto;">
                     <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions"
@@ -189,3 +187,14 @@
         [fullScreen]="true">
         <p style="color: white"> Preparando... </p>
     </ngx-spinner>
+
+    <ng-template #labelCentro>
+        <p>{{centroCosto.nombre}}</p>
+      </ng-template>
+
+      <ng-template #sinGrupo>
+        <div style="width: 100%; margin: auto;" class="div-valores">
+            <p class="titulo-lecturas">Total</p>
+            <p class="valor"> {{ totalMedicion | number:'1.1-2':'en_US'}} kWh</p>
+        </div>
+      </ng-template>

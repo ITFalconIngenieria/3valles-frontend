@@ -42,6 +42,10 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { VistaComponent } from './pages/vista/vista.component';
+import { ModalMedidorComponent } from './pages/vista/modal-medidor/modal-medidor.component';
+import { ModalFactorComponent } from './pages/vista/modal-factor/modal-factor.component';
+import { ModalEditarComponent } from './pages/vista/modal-editar/modal-editar.component';
 // import { NzI18nService } from 'ng-zorro-antd/i18n';
 // import { enUS, ja } from 'date-fns/locale';
 
@@ -59,7 +63,11 @@ registerLocaleData(en);
     TransformadoresComponent,
     ConsumidoresComponent,
     FacturaComponent,
-    DashboardComponent
+    DashboardComponent,
+    VistaComponent,
+    ModalMedidorComponent,
+    ModalFactorComponent,
+    ModalEditarComponent
   ],
   imports: [
     BrowserModule,

@@ -20,8 +20,8 @@ getConsumoMedidores(cc:number,f1:string,f2:string) {
   return this.http.get(`${apiUrl}consumo-medidores?cc=${cc}&f1=${f1}&f2=${f2}`)
 }
 
-getFactores(cc:number,grupo:number){
-  return this.http.get(`${apiUrl}factores-factura?cc=${cc}&grupo=${grupo}`)
+getFactores(grupo:number){
+  return this.http.get(`${apiUrl}factores-factura?grupo=${grupo}`)
 }
 
   getResumen(fechai:string,fechaf:string){

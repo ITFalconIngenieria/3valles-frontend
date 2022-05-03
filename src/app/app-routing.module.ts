@@ -10,8 +10,10 @@ import { MenuComponent } from './pages/menu/menu.component';
 import { TransformadoresComponent } from './pages/transformadores/transformadores.component';
 import { WelcomeComponent } from './pages/welcome/welcome.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-
-
+import { VistaComponent } from './pages/vista/vista.component';
+import { ModalMedidorComponent } from './pages/vista/modal-medidor/modal-medidor.component';
+import { ModalFactorComponent } from './pages/vista/modal-factor/modal-factor.component';
+import { ModalEditarComponent } from './pages/vista/modal-editar/modal-editar.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: '/login' },
@@ -27,6 +29,12 @@ const routes: Routes = [
       { path: 'transformadores', component: TransformadoresComponent },
       { path: 'factura', component: FacturaComponent },
       { path: 'dashboard', component: DashboardComponent },
+      { path:'vista',component:VistaComponent, 
+    children: [
+        { path: 'modal-factor', component: ModalFactorComponent },
+        { path: 'modal-medidor', component: ModalMedidorComponent},
+        { path: 'modal-editar', component: ModalEditarComponent }
+    ]}
     ]
   }
   // { path: 'welcome', loadChildren: () => import('./pages/welcome/welcome.module').then(m => m.WelcomeModule) }

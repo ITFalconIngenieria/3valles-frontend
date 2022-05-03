@@ -21,18 +21,18 @@ export class FacturaComponent implements OnInit {
   visible: boolean = false;
   visibleFecha: boolean = false;
   fecha: any;
- // cliente: any;
-  centroCosto:any;
-//  medidor: any;
-  grupo:any;
+  // cliente: any;
+  centroCosto: any;
+  //  medidor: any;
+  grupo: any;
   tiempo: any;
   listOfEntidad: any[] = [];
-  listOfCentroCosto: any[] =[];
-  listOfGrupo:any[]=[];
-  listOfGrupoFiltrado:any[]=[];
-  factores:any;
-/*  listOfMedidor: any[] = [];
-  listOfMedidorFiltrado: any[] = [];*/
+  listOfCentroCosto: any[] = [];
+  listOfGrupo: any[] = [];
+  listOfGrupoFiltrado: any[] = [];
+  factores: any;
+  /*  listOfMedidor: any[] = [];
+    listOfMedidorFiltrado: any[] = [];*/
   fechaDia: any = new Date();
   fecha1: any = new Date();
   fecha2: any = new Date();
@@ -42,40 +42,32 @@ export class FacturaComponent implements OnInit {
   barChartLegend: any;
   barChartData: any[] = [];
   dataFactura: any;
-  totalMedicion:number;
+  totalMedicion: number;
   detallePerdidas: any[] = [];
   consumoHistorico: any[] = [];
 
   constructor(
     private spinner: NgxSpinnerService,
-/*    private serviceEntidad: EntidadService,
-    private serviceMedidor: MedidorService,*/
+    /*    private serviceEntidad: EntidadService,
+        private serviceMedidor: MedidorService,*/
     private serviceFactura: FacturaService,
-    private serviceCentroCosto:centroCostoService,
-    private serviceGrupo:grupoService,
+    private serviceCentroCosto: centroCostoService,
+    private serviceGrupo: grupoService,
     private nzMessageService: NzMessageService
   ) { }
 
   ngOnInit() {
     this.serviceCentroCosto.getCentroCosto()
       .toPromise()
-      .then((data:any)=>{
-        this.listOfCentroCosto=data;
+      .then((data: any) => {
+        this.listOfCentroCosto = data;
         this.serviceGrupo.getGrupo()
-        .toPromise()
-        .then((data:any)=>this.listOfGrupo=data)
+          .toPromise()
+          .then((data: any) => this.listOfGrupo = data)
       })
 
     this.dataFactura = '';
-/*    this.serviceEntidad.getEntidadFilter()
-      .toPromise()
-      .then((data: any) => {
-        this.listOfEntidad = data;
-        this.serviceMedidor.getMedidorEntidad()
-          .toPromise()
-          .then((datos: any) => this.listOfGrupo = datos);
-      });
-*/
+
     this.barChartOptions = {
       scaleShowVerticalLines: false,
       responsive: true,
@@ -101,6 +93,7 @@ export class FacturaComponent implements OnInit {
     this.visible = false;
     this.fecha1 = undefined;
     this.fecha2 = undefined;
+    
     let data: any[] = [];
     switch (this.tiempo) {
       case '1': {
@@ -164,40 +157,50 @@ export class FacturaComponent implements OnInit {
       default:
         break;
     }
-    if (this.centroCosto=== undefined || this.fecha1 === undefined || this.fecha2 === undefined) {
+    if (this.centroCosto === undefined || this.fecha1 === undefined || this.fecha2 === undefined) {
       this.nzMessageService.warning('No se puede mostrar el reporte, revise el medidor y las fechas seleccionadas y seleccione los correctos.');
     }
     else {
-/*      this.serviceFactura.getDetalle(this.fecha1, this.fecha2, this.medidor.id)
+      /*      this.serviceFactura.getDetalle(this.fecha1, this.fecha2, this.medidor.id)
+              .toPromise()
+              .then((datos: any) => {
+                this.dataFactura = datos;
+                this.detallePerdidas = this.dataFactura.detallePerdidas;
+                this.barChartLabels = this.dataFactura.consumoHistorico.map((item) => item.label);
+                data = this.dataFactura.consumoHistorico.map((item) => item.valor);
+      
+                this.barChartData = [
+                  {
+                    data, label: 'kW',
+                    backgroundColor: '#043f79',
+                  }
+                ];
+              });*/
+      this.serviceFactura.getConsumoMedidores(this.centroCosto.id, this.fecha1, this.fecha2)
         .toPromise()
         .then((datos: any) => {
-          this.dataFactura = datos;
-          this.detallePerdidas = this.dataFactura.detallePerdidas;
-          this.barChartLabels = this.dataFactura.consumoHistorico.map((item) => item.label);
-          data = this.dataFactura.consumoHistorico.map((item) => item.valor);
-
+          this.dataFactura = datos
+          this.totalMedicion = 0
+          this.dataFactura.map((data) => this.totalMedicion += (data.final - data.inicial)*data.operacion)
+          
+          this.barChartLabels.push(this.fecha2)
+          data.push(this.totalMedicion)
+      
           this.barChartData = [
-            {
-              data, label: 'kW',
-              backgroundColor: '#043f79',
-            }
-          ];
-        });*/
-      this.serviceFactura.getConsumoMedidores(this.centroCosto.id,this.fecha1,this.fecha2)
-      .toPromise()
-      .then((datos:any)=>{
-        this.dataFactura=datos
-        this.totalMedicion=0
-        this.dataFactura.map((data) => this.totalMedicion+=data.final-data.inicial)
-        console.log(this.totalMedicion)
-      })
+              {
+                data, label: 'kW',
+                backgroundColor: '#043f79',
+              }
+            ];
+        })
 
-      this.serviceFactura.getFactores(this.centroCosto.id,this.grupo.id)
-      .toPromise()
-      .then((datos:any)=>{
-        this.factores=datos
-        console.log(this.factores)
-      })
+      if (this.grupo) {
+        this.serviceFactura.getFactores(this.grupo.id)
+          .toPromise()
+          .then((datos: any) => {
+            this.factores = datos
+          })
+      }
       this.visible = true;
     }
   }

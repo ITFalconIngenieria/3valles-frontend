@@ -4,6 +4,7 @@ import { MedidorService } from 'src/app/servicios/medidores.service';
 import { MedidorModel, ColumnItem, PMEMedidorModel, RolloverModel, variableModel } from '../../modelos/medidor';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { DatePipe } from '@angular/common';
+import { DatosService } from 'src/app/servicios/datos.service';
 
 @Component({
   selector: 'app-medidor',
@@ -16,8 +17,8 @@ export class MedidorComponent implements OnInit {
   isVisibleRollover = false;
   isVisibleVariable = false;
   isVisibleData = false;
-  isVisibleQuantity=false;
-  isVisibleTipo=false;
+  isVisibleQuantity = false;
+  isVisibleTipo = false;
   validateForm: FormGroup;
   validateFormRollover: FormGroup;
   validateFormVariable: FormGroup;
@@ -28,7 +29,8 @@ export class MedidorComponent implements OnInit {
   permiso: any;
   idMedidor
   idRollover;
-  idVariable
+  idVariable;
+  idDatos;
   codigoMedidor;
   medidorEdit;
   dataMedidor;
@@ -41,7 +43,7 @@ export class MedidorComponent implements OnInit {
   listOfVariable: variableModel[] = [];
   listOfVariablePME: variableModel[] = [];
   listOfDataRolloverMedidor: RolloverModel[] = [];
-  listOfDatosManuales: any []=[];
+  listOfDatosManuales: any[] = [];
 
   listOfColumns: ColumnItem[] = [
     {
@@ -73,6 +75,7 @@ export class MedidorComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private medidorService: MedidorService,
+    private datosService: DatosService,
     private nzMessageService: NzMessageService
   ) { }
 
@@ -137,7 +140,7 @@ export class MedidorComponent implements OnInit {
 
   showModal(): void {
     this.isVisible = true;
-    this.isVisibleTipo=true;
+    this.isVisibleTipo = true;
   }
 
   handleCancel(): void {
@@ -208,7 +211,7 @@ export class MedidorComponent implements OnInit {
   }
 
   editar(data): void {
-    this.isVisibleTipo=data.tipo;
+    this.isVisibleTipo = data.tipo;
     this.accion = 'editar';
     this.isVisible = true;
     this.medidorEdit = data.id;
@@ -251,7 +254,7 @@ export class MedidorComponent implements OnInit {
   }
 
   changeTipo(index) {
-    this.isVisibleTipo = index ==="true"? true : false;
+    this.isVisibleTipo = index === "true" ? true : false;
   }
 
   //ROLLOVER
@@ -352,18 +355,18 @@ export class MedidorComponent implements OnInit {
           }
         )
     } else {
-        this.medidorService.postRollover(dataRollover).toPromise().then(
-          (data:RolloverModel) => {
-            this.listOfDataRolloverMedidor = [...this.listOfDataRolloverMedidor, data];
-            this.nzMessageService.success('El registro fue guardado con éxito');
-            this.limpiarRollover();
-          },
-          (error) => {
-            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
-            console.log(error);
-            this.limpiarRollover();
-          }
-        )
+      this.medidorService.postRollover(dataRollover).toPromise().then(
+        (data: RolloverModel) => {
+          this.listOfDataRolloverMedidor = [...this.listOfDataRolloverMedidor, data];
+          this.nzMessageService.success('El registro fue guardado con éxito');
+          this.limpiarRollover();
+        },
+        (error) => {
+          this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+          this.limpiarRollover();
+        }
+      )
     }
   }
 
@@ -388,7 +391,7 @@ export class MedidorComponent implements OnInit {
         () => {
           this.nzMessageService.success('El registro fue eliminado con éxito');
           this.listOfDataRolloverMedidor = this.listOfDataRolloverMedidor.filter(x => x.id !== data.id);
-        //  this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
+          //  this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
         },
         (error) => {
           this.nzMessageService.warning('El registro no pudo ser eleminado, por favor intente de nuevo o contactese con su administrador');
@@ -397,77 +400,77 @@ export class MedidorComponent implements OnInit {
       );
   }
 
-    //Variables
-    showModalVariable(data): void {
-      this.isVisibleVariable = true;
-      this.idMedidor = data.id;
-      this.isVisibleQuantity = data.tipo;
-     
-      this.medidorService.getVariable().toPromise().then(
-        (data: variableModel[]) => {
-          this.listOfVariable = data;
-        },
-        (error) => {
-          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
-          console.log(error);
-        }
-      );
+  //Variables
+  showModalVariable(data): void {
+    this.isVisibleVariable = true;
+    this.idMedidor = data.id;
+    this.isVisibleQuantity = data.tipo;
 
-      this.medidorService.getVariablePME().toPromise().then(
-        (data: variableModel[]) => {
-          this.listOfVariablePME = data;
-        },
-        (error) => {
-          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
-          console.log(error);
-        }
-      );
-
-      this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
-        (data: variableModel[]) => {
-          this.listOfPME2 = data;
-        },
-        (error) => {
-          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
-          console.log(error);
-        }
-      );
-    }
-
-    handleCancelVariables(): void {
-      this.accion = 'new';
-      this.isVisibleVariable = false;
-      this.limpiarVariables();
-    }
-
-    handleOkVariables(): void {
-      this.limpiarVariables()
-      this.isVisibleVariable = false;
-    }
-
-    limpiarVariables() {
-      this.validateFormVariable = this.fb.group({
-        variableId: [null, [Validators.required]],
-        quantityId: [null, [Validators.required]]
-      });
-    }
-
-    guardarVariables() {
-      const dataVariable ={
-        medidorId: this.idMedidor,
-        variableId: this.validateFormVariable.value.variableId,
-        quantityId: this.isVisibleQuantity === true ? this.validateFormVariable.value.quantityId:0,
-        estado: true
+    this.medidorService.getVariable().toPromise().then(
+      (data: variableModel[]) => {
+        this.listOfVariable = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
       }
+    );
 
-      if (this.accion === 'editar') {
-        this.medidorService
-        .putVariable(this.idVariable,dataVariable)
+    this.medidorService.getVariablePME().toPromise().then(
+      (data: variableModel[]) => {
+        this.listOfVariablePME = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    );
+
+    this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
+      (data: variableModel[]) => {
+        this.listOfPME2 = data;
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
+      }
+    );
+  }
+
+  handleCancelVariables(): void {
+    this.accion = 'new';
+    this.isVisibleVariable = false;
+    this.limpiarVariables();
+  }
+
+  handleOkVariables(): void {
+    this.limpiarVariables()
+    this.isVisibleVariable = false;
+  }
+
+  limpiarVariables() {
+    this.validateFormVariable = this.fb.group({
+      variableId: [null, [Validators.required]],
+      quantityId: [null, [Validators.required]]
+    });
+  }
+
+  guardarVariables() {
+    const dataVariable = {
+      medidorId: this.idMedidor,
+      variableId: this.validateFormVariable.value.variableId,
+      quantityId: this.isVisibleQuantity === true ? this.validateFormVariable.value.quantityId : 0,
+      estado: true
+    }
+
+    if (this.accion === 'editar') {
+      this.medidorService
+        .putVariable(this.idVariable, dataVariable)
         .toPromise()
         .then(
-          (datar:any) => {
+          (datar: any) => {
             for (const item of this.listOfPME2.filter(x => x.id === this.idVariable)) {
-              item.id=datar.id;
+              item.id = datar.id;
               item.variableMedidorId = datar.variableMedidorId;
               item.medidorId = datar.medidorId;
               item.quantityId = datar.quantityId;
@@ -487,136 +490,208 @@ export class MedidorComponent implements OnInit {
             this.isVisible = false;
           }
         )
-      }else{
-        this.medidorService.postVariable(dataVariable).toPromise().then(
-          (data) => {
-            this.listOfPME2 = [...this.listOfPME2, data];
-            this.nzMessageService.success('El registro fue guardado con éxito');
-            this.limpiarVariables();
-          },
-          (error) => {
-            this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
-            console.log(error);
-            this.limpiarVariables();
-          }
-        )
-      }
+    } else {
+      this.medidorService.postVariable(dataVariable).toPromise().then(
+        (data) => {
+          this.listOfPME2 = [...this.listOfPME2, data];
+          this.nzMessageService.success('El registro fue guardado con éxito');
+          this.limpiarVariables();
+        },
+        (error) => {
+          this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+          this.limpiarVariables();
+        }
+      )
     }
+  }
 
-    editarVariables(data) {
-      this.idVariable = data.id;
-      this.accion = 'editar';
-  
-      this.validateFormVariable = this.fb.group({
-        variableId: [data.variableId, [Validators.required]],
-        quantityId: [data.quantityId, [Validators.required]],
-      });
-    }
+  editarVariables(data) {
+    this.idVariable = data.id;
+    this.accion = 'editar';
 
-    eliminarVariables(data) {
-      this.medidorService.deleteVariable(data.id, { estado: false })
+    this.validateFormVariable = this.fb.group({
+      variableId: [data.variableId, [Validators.required]],
+      quantityId: [data.quantityId, [Validators.required]],
+    });
+  }
+
+  eliminarVariables(data) {
+    this.medidorService.deleteVariable(data.id, { estado: false })
       .toPromise()
       .then(
         () => {
           this.nzMessageService.success('El registro fue eliminado con éxito');
           this.listOfPME2 = this.listOfPME2.filter(x => x.id !== data.id);
-        //  this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
+          //  this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
         },
         (error) => {
           this.nzMessageService.warning('El registro no pudo ser eleminado, por favor intente de nuevo o contactese con su administrador');
           console.log(error);
         }
       );
-    }
+  }
 
-    submitFormVariable(): void {
-      for (const i in this.validateFormVariable.controls) {
-        this.validateFormVariable.controls[i].markAsDirty();
-        this.validateFormVariable.controls[i].updateValueAndValidity();
+  submitFormVariable(): void {
+    for (const i in this.validateFormVariable.controls) {
+      this.validateFormVariable.controls[i].markAsDirty();
+      this.validateFormVariable.controls[i].updateValueAndValidity();
+    }
+  }
+
+  //DATA
+  limpiarData() {
+    this.validateFormData = this.fb.group({
+      variableMedidorId: [null, [Validators.required]],
+      fecha: [null, [Validators.required]],
+      lectura: [null, [Validators.required]]
+    });
+  }
+
+  submitFormData(): void {
+    for (const i in this.validateFormData.controls) {
+      this.validateFormData.controls[i].markAsDirty();
+      this.validateFormData.controls[i].updateValueAndValidity();
+    }
+  }
+
+  showModalData(data): void {
+    this.isVisibleData = true;
+    this.idMedidor = data.id;
+
+    this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
+      (data: variableModel[]) => {
+        this.listOfVariable = data;
+        this.datosService.getDatosId(String(data.map((x) => x.id))).toPromise().then(
+          (data: any[]) => {
+            console.log(data)
+            this.listOfDatosManuales = data
+          }
+        )
+      },
+      (error) => {
+        this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+        console.log(error);
       }
+    );
+    /*     this.idMedidor = data.id;
+   
+         this.medidorService.getVariable().toPromise().then(
+           (data: variableModel[]) => {
+             this.listOfVariable = data;
+           },
+           (error) => {
+             this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+             console.log(error);
+           }
+         );
+   
+         this.medidorService.getVariablePME().toPromise().then(
+           (data: variableModel[]) => {
+             this.listOfVariablePME = data;
+           },
+           (error) => {
+             this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+             console.log(error);
+           }
+         );
+   
+         this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
+           (data: variableModel[]) => {
+             this.listOfPME2 = data;
+           },
+           (error) => {
+             this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+             console.log(error);
+           }
+         );*/
+  }
+
+  handleCancelData(): void {
+    this.accion = 'new';
+    this.isVisibleData = false;
+    this.limpiarData();
+  }
+
+  handleOkData(): void {
+    this.limpiarData()
+    this.isVisibleData = false;
+  }
+
+  guardarData() {
+    const myFormattedDate = this.pipe.transform(this.validateFormData.value.fecha, 'yyyy-MM-dd HH:mm', '-1200');
+    const dataManual = {
+      variableId: this.validateFormData.value.variableMedidorId,
+      fecha: (new Date(myFormattedDate)).toISOString(),
+      lectura: this.validateFormData.value.lectura,
+      estado: true
     }
 
-    //DATA
-    limpiarData() {
-      this.validateFormData = this.fb.group({
-        variableMedidorId: [null, [Validators.required]],
-        fecha: [null, [Validators.required]],
-        lectura: [null, [Validators.required]]
-      });
-    }
-
-    submitFormData(): void {
-      for (const i in this.validateFormData.controls) {
-        this.validateFormData.controls[i].markAsDirty();
-        this.validateFormData.controls[i].updateValueAndValidity();
-      }
-    }
-
-    showModalData(data): void {
-      this.isVisibleData = true;
-      this.idMedidor = data.id;
-
-      this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
-        (data: variableModel[]) => {
-          this.listOfVariable = data;
+    if (this.accion === 'editar') {
+      this.datosService
+      .putDatos(this.idDatos, dataManual)
+      .toPromise()
+      .then(
+        (datam: any) => {
+          for (const item of this.listOfDatosManuales.filter(x => x.id === this.idDatos)) {
+            item.id = datam.id;
+            item.variableId = datam.variableId;
+            item.fecha = datam.fecha;
+            item.lectura = datam.lectura;
+            item.estado = datam.estado;
+          }
+          this.accion = 'new';
+          this.limpiarVariables();
+          this.isVisible = false;
+          this.nzMessageService.success('El registro fue guardado con éxito');
+        }, (error) => {
+          this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+          this.limpiarVariables();
+          this.accion = 'new';
+          this.isVisible = false;
+        }
+      )
+    } else {
+      this.datosService.postDatos(dataManual).toPromise().then(
+        (data) => {
+          this.listOfDatosManuales = [...this.listOfDatosManuales, data];
+          this.nzMessageService.success('El registro fue guardado con éxito');
+          this.limpiarData();
         },
         (error) => {
-          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
+          this.nzMessageService.warning('El registro no pudo ser guardado, por favor intente de nuevo o contactese con su administrador');
+          console.log(error);
+          this.limpiarData();
+        }
+      )
+    }
+  }
+
+  editarDatos(data) {
+    this.idDatos = data.id;
+    this.accion = 'editar';
+
+    this.validateFormData = this.fb.group({
+      variableMedidorId: [data.variableMedidorId, [Validators.required]],
+      fecha: [data.fecha, [Validators.required]],
+      lectura: [data.lectura, [Validators.required]]
+    });
+  }
+
+  eliminarDatos(data) {
+    this.datosService.deleteDatos(data.id, { estado: false })
+      .toPromise()
+      .then(
+        () => {
+          this.nzMessageService.success('El registro fue eliminado con éxito');
+          this.listOfDatosManuales = this.listOfDatosManuales.filter(x => x.id !== data.id);
+          //  this.listOfDataRollover = this.listOfDataRollover.filter(x => x.id !== data.id);
+        },
+        (error) => {
+          this.nzMessageService.warning('El registro no pudo ser eleminado, por favor intente de nuevo o contactese con su administrador');
           console.log(error);
         }
       );
- /*     this.idMedidor = data.id;
-
-      this.medidorService.getVariable().toPromise().then(
-        (data: variableModel[]) => {
-          this.listOfVariable = data;
-        },
-        (error) => {
-          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
-          console.log(error);
-        }
-      );
-
-      this.medidorService.getVariablePME().toPromise().then(
-        (data: variableModel[]) => {
-          this.listOfVariablePME = data;
-        },
-        (error) => {
-          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
-          console.log(error);
-        }
-      );
-
-      this.medidorService.getVariablesPME(this.idMedidor).toPromise().then(
-        (data: variableModel[]) => {
-          this.listOfPME2 = data;
-        },
-        (error) => {
-          this.nzMessageService.warning('No se pudo conectar al servidor, revise su conexión a internet o comuníquese con el proveedor.');
-          console.log(error);
-        }
-      );*/
-    }
-
-    handleCancelData(): void {
-      this.accion = 'new';
-      this.isVisibleData = false;
-      this.limpiarData();
-    }
-
-    handleOkData(): void {
-      this.limpiarData()
-      this.isVisibleData = false;
-    }
-
-    guardarData() {
-      const myFormattedDate = this.pipe.transform(this.validateFormData.value.fecha, 'yyyy-MM-dd HH:mm', '-1200');
-      const dataManual ={
-        variableId: this.validateFormData.value.variableMedidorId,
-        fecha: (new Date(myFormattedDate)).toISOString(),
-        lectura: this.validateFormData.value.lectura,
-        estado: true
-      }
-      console.log(dataManual)
-    }
+  }
 }
