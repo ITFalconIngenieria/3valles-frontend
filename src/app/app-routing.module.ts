@@ -16,7 +16,7 @@ import { ModalFactorComponent } from './pages/vista/modal-factor/modal-factor.co
 import { ModalEditarComponent } from './pages/vista/modal-editar/modal-editar.component';
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: '/login' },
+  { path: '', pathMatch: 'full', redirectTo: '/welcome' },
   { path: 'login', component: LoginComponent },
   {
     path: '', component: MenuComponent,
