@@ -11,22 +11,24 @@ export class FacturaService {
 
   constructor(private http: HttpClient) { }
 
-/*  getDetalle(fechai:string,fechaf:string,medidor:number) {
-      return this.http.get(`${apiUrl}factura-datos/${medidor}?fechai=${fechai}&fechaf=${fechaf}`)
-  }
-*/
+  /*  getDetalle(fechai:string,fechaf:string,medidor:number) {
+        return this.http.get(`${apiUrl}factura-datos/${medidor}?fechai=${fechai}&fechaf=${fechaf}`)
+    }
+  */
 
-getConsumoMedidores(cc:number,f1:string,f2:string) {
-  return this.http.get(`${apiUrl}consumo-medidores?cc=${cc}&f1=${f1}&f2=${f2}`)
-}
-
-getFactores(grupo:number){
-  return this.http.get(`${apiUrl}factores-factura?grupo=${grupo}`)
-}
-
-  getResumen(fechai:string,fechaf:string){
-      return this.http.get(`${apiUrl}resumen-datos?fechai=${fechai}&fechaf=${fechaf}`)
- //  return this.http.get(`${apiUrl}resumen-datos?fechai=20210201&fechaf=20210301`)
+  getConsumoMedidores(cc: number, f1: string, f2: string) {
+    return this.http.get(`${apiUrl}consumo-medidores?cc=${cc}&f1=${f1}&f2=${f2}`)
   }
 
+  getFactores(grupo: number) {
+    return this.http.get(`${apiUrl}factores-factura?grupo=${grupo}`)
+  }
+
+  getGeneracion(tipo: boolean, f1: string, f2: string) {
+    return this.http.get(`${apiUrl}generacion?tipo=${tipo}&f1=${f1}&f2=${f2}`)
+  }
+
+  getVenta(f1: string, f2: string) {
+    return this.http.get(`${apiUrl}ventaEnee?f1=${f1}&f2=${f2}`)
+  }
 }

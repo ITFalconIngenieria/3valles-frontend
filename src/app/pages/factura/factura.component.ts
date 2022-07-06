@@ -43,6 +43,8 @@ export class FacturaComponent implements OnInit {
   barChartData: any[] = [];
   dataFactura: any;
   totalMedicion: number;
+  totalGeneracion: number;
+  totalEnee: number;
   detallePerdidas: any[] = [];
   consumoHistorico: any[] = [];
 
@@ -181,8 +183,16 @@ export class FacturaComponent implements OnInit {
         .then((datos: any) => {
           this.dataFactura = datos
           this.totalMedicion = 0
-          this.dataFactura.map((data) => this.totalMedicion += (data.final - data.inicial)*data.operacion)
-          
+          this.totalGeneracion = 0
+          this.totalEnee = 0
+          this.dataFactura.map((data) => {
+            this.totalMedicion += (data.final - data.inicial)*data.operacion
+            this.totalGeneracion += data.Generacion * data.operacion
+            this. totalEnee += data.Enee * data.operacion
+          })
+          this.barChartLabels=[]
+          data=[]
+
           this.barChartLabels.push(this.fecha2)
           data.push(this.totalMedicion)
       

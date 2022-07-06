@@ -5,6 +5,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import * as moment from 'moment';
 import { FacturaService } from 'src/app/servicios/factura.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { centroCostoService } from 'src/app/servicios/centroCosto.service';
+import { async } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,7 +28,7 @@ export class DashboardComponent implements OnInit {
   perdida: number = 0;
   consumo: number = 0;
   dataGeneracion: any[] = [];
-  dataConsumo: any[] = [];
+  dataConsumo: any[] = []
 
   ChartGenetOptions: any;
   ChartGenetLabels: any[] = [];
@@ -44,6 +46,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private spinner: NgxSpinnerService,
     private serviceFactura: FacturaService,
+    private serviceCentroCosto: centroCostoService,
     private nzMessageService: NzMessageService,
   ) { }
 
@@ -107,7 +110,7 @@ export class DashboardComponent implements OnInit {
         break;
       }
       case '11': {
-        if (this.fecha != undefined && this.fecha.length>0 ) {
+        if (this.fecha != undefined && this.fecha.length > 0) {
           this.fecha1 = moment(this.fecha[0]).format('YYYY-MM-DD HH:mm');
           this.fecha2 = moment(this.fecha[1]).format('YYYY-MM-DD HH:mm');
         }
@@ -121,18 +124,13 @@ export class DashboardComponent implements OnInit {
       this.nzMessageService.warning('No se puede mostrar el reporte, revise las fechas seleccionadas y seleccione un rango de tiempo correcto.');
     }
     else {
-      this.serviceFactura.getResumen(this.fecha1, this.fecha2)
+      this.serviceFactura.getGeneracion(false, this.fecha1, this.fecha2)
         .toPromise()
         .then((datos: any) => {
-          this.ventaEnee = datos.detalleConsumo.filter((item) => item.id == 1012)[0].Consumo;
-          this.compraEnee = datos.detalleGeneracion.filter((item) => item.tipoEntidad === true).map((item) => item.Consumo).reduce((a, b) => a + b)
-
-          this.generacion = datos.totalGeneracion - this.compraEnee;
-          this.consumo = datos.totalConsumo - this.ventaEnee;
-          this.perdida = datos.totalGeneracion - datos.totalConsumo;
-
-          this.dataGeneracion = datos.detalleGeneracion.filter((item) => item.tipoEntidad === false);
-          this.dataConsumo = datos.detalleConsumo.filter((item) => item.tipoEntidad === false);
+          this.dataGeneracion=datos;
+          console.log(this.dataGeneracion)
+          this.generacion = datos.map(x => x.final - x.inicial).reduce(
+            (previousValue, currentValue) => previousValue + currentValue)
 
           this.ChartGenetOptions = {
             scaleShowVerticalLines: true,
@@ -146,44 +144,107 @@ export class DashboardComponent implements OnInit {
               },
             },
             scale: {
-                ticks: {
-                  callback: value => value.toLocaleString('en-US') + ' kWh'
-                }
+              ticks: {
+                callback: value => value.toLocaleString('en-US') + ' kWh'
+              }
             }
           };
 
-          this.ChartGenetLabels = datos.detalleGeneracion.filter((item) => item.tipoEntidad === false).map((item) => item.medidor);
-
+          this.ChartGenetLabels = datos.map(x => x.descripcion)
           this.ChartGenetType = 'polarArea';
           this.ChartGenetLegend = true;
           this.ChartGenetData = [
             {
-              data: datos.detalleGeneracion.filter((item) => item.tipoEntidad === false).map((item) => item.Consumo),
+              data: datos.map(x => x.final - x.inicial),
               backgroundColor: this.backgroundColor,
               borderColor: this.backgroundColor
             }
           ];
-
-          //// Grafico Consumo
-          this.ChartConsuOptions = {
-            responsive: true,
-            tooltips: {
-              callbacks: {
-                label: function (t, d) {
-                  return d.labels[t.index] + ': ' + d.datasets[0].data[t.index].toLocaleString('en-US') + ' kWh';
-                },
-              },
-            }
-          };
-          this.ChartConsuLabels = datos.detalleConsumo.filter((item) => item.tipoEntidad === false).map((item) => item.medidor);
-          this.ChartConsuData = [
-            {
-              data: datos.detalleConsumo.filter((item) => item.tipoEntidad === false).map((item) => item.Consumo),
-              backgroundColor: this.backgroundColor,
-            }
-          ];
-          this.ChartConsuType = 'doughnut';
+          //*********
         })
+
+      this.serviceFactura.getGeneracion(true, this.fecha1, this.fecha2)
+        .toPromise()
+        .then((datos: any) => {
+          this.compraEnee = datos.map(x => x.final - x.inicial).reduce(
+            (previousValue, currentValue) => previousValue + currentValue)
+        })
+
+      this.serviceFactura.getVenta(this.fecha1, this.fecha2)
+        .toPromise()
+        .then((datos: any) => {
+          this.ventaEnee = datos.map(x => x.final - x.inicial).reduce(
+            (previousValue, currentValue) => previousValue + currentValue)
+        })
+
+      
+
+      this.serviceCentroCosto.getCentroCosto()
+        .toPromise()
+        .then((data: any) => {
+ //         console.log('centroCosto: ',data)
+
+          //let contenido = data.map(x=>{return {...x,datos:0}})
+          let etiquetas=[]
+          let valores=[]
+          this.dataConsumo=[]
+          data.map(centroCosto => {
+           
+           this.serviceFactura.getConsumoMedidores(centroCosto.id, this.fecha1, this.fecha2)
+              .toPromise()
+              .then((datosConsumo: any) => {  
+                let total=0
+                datosConsumo.map(x => {
+                  this.consumo += (x.final - x.inicial) * x.operacion
+                  this.perdida= (this.generacion+this.compraEnee)-(this.consumo+this.ventaEnee)
+                  total+= (x.final - x.inicial) * x.operacion
+                })
+                //centroCosto.datos=total
+                etiquetas.push(centroCosto.nombre)
+                valores.push(total)
+                this.dataConsumo=[...this.dataConsumo,{nombre:centroCosto.nombre,valor:total}]
+              })
+          })
+
+
+                     //// Grafico Consumo
+                     this.ChartConsuOptions = {
+                      responsive: true,
+                      tooltips: {
+                        callbacks: {
+                          label: function (t, d) {
+                            return d.labels[t.index] + ': ' + d.datasets[0].data[t.index].toLocaleString('en-US') + ' kWh';
+                          },
+                        },
+                      }
+                    };
+                    this.ChartConsuLabels = etiquetas
+
+                    this.ChartConsuData = [
+                      {
+                        //data: datos.detalleConsumo.filter((item) => item.tipoEntidad === false).map((item) => item.Consumo),
+                        data: valores,
+                        backgroundColor: this.backgroundColor,
+                      }
+                    ];
+                    this.ChartConsuType = 'doughnut';
+       })
+
+
+      /*     this.ventaEnee = datos.detalleConsumo.filter((item) => item.id == 1012)[0].Consumo;
+           this.compraEnee = datos.detalleGeneracion.filter((item) => item.tipoEntidad === true).map((item) => item.Consumo).reduce((a, b) => a + b)
+ 
+           this.generacion = datos.totalGeneracion - this.compraEnee;
+           this.consumo = datos.totalConsumo - this.ventaEnee;
+           this.perdida = datos.totalGeneracion - datos.totalConsumo;
+ 
+           this.dataGeneracion = datos.detalleGeneracion.filter((item) => item.tipoEntidad === false);
+           this.dataConsumo = datos.detalleConsumo.filter((item) => item.tipoEntidad === false);
+ 
+
+ */
+  
+
       this.visible = true;
     }
   }
@@ -198,7 +259,7 @@ export class DashboardComponent implements OnInit {
 
     const options = {
       background: 'white',
-      scale: 3
+      scale: 1
     };
 
     const doc = new jsPDF('p', 'mm', 'letter', true);

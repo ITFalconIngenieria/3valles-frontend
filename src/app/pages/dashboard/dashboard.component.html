@@ -84,22 +84,18 @@
                 <thead>
                     <tr>
                         <th>Medicion</th>
-                        <th>Lectura Inicial (kWh)</th>
-                        <th>Lectura Final (kWh)</th>
-                        <th>Generacion (kWh)</th>
+                        <th>Consumo (kWh)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let data of generacionTable.data">
-                        <td>{{ data.medidor }}</td>
-                        <td nzAlign="right">{{ data.FF | number:'1.0':'en_US'}}</td>
-                        <td nzAlign="right">{{ data.FI | number:'1.0':'en_US'}}</td>
-                        <td nzAlign="right">{{ data.Consumo | number:'1.0':'en_US'}}</td>
+                        <td>{{ data.descripcion }}</td>
+                        <td nzAlign="right">{{ data.final - data.inicial | number:'1.0':'en_US'}}</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="3">Total (kWh)</th>
+                        <th>Total (kWh)</th>
                         <th nzAlign="right">{{generacion | number:'1.0':'en_US'}}</th>
                     </tr>
                 </tfoot>
@@ -111,23 +107,19 @@
                 [nzFrontPagination]="false">
                 <thead>
                     <tr>
-                        <th>Medicion</th>
-                        <th>Lectura Inicial (kWh)</th>
-                        <th>Lectura Final (kWh)</th>
+                        <th>Centro de Costo</th>
                         <th>Consumo (kWh)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let data of consumoTable.data">
-                        <td>{{ data.medidor }}</td>
-                        <td nzAlign="right">{{ data.FF | number:'1.0':'en_US'}}</td>
-                        <td nzAlign="right">{{ data.FI | number:'1.0':'en_US'}}</td>
-                        <td nzAlign="right">{{ data.Consumo | number:'1.0':'en_US'}}</td>
+                        <td>{{ data.nombre }}</td>
+                        <td nzAlign="right">{{ data.valor | number:'1.0':'en_US'}}</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="3">Total (kWh)</th>
+                        <th>Total (kWh)</th>
                         <th nzAlign="right">{{consumo | number:'1.0':'en_US'}}</th>
                     </tr>
                 </tfoot>
